@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\begin{document}
+
+\section*{Name: name(To be changed later.)}
+
+\section*{Domain}
+Outdoor event planning (picnics, hikes). The program helps users organize outdoor activities by providing location options, real-time weather data, and AI-driven safety tips.
+
+\section*{Software Specification}
+The program allows users to input an event type, such as "hiking" or "picnic," and shows nearby locations using Google Maps API. It provides real-time weather data for those locations using OpenWeather API. The program also generates AI-driven safety tips, such as "Bring sunscreen and water for warm weather," using OpenAI API. An additional optional feature is an emergency contact option, allowing users to send quick updates on their location to friends or family.
+
+\section*{User Stories}
+\begin{enumerate}
+    \item Emma wants to go on a hike. She enters "hiking" into the app, and it shows her nearby locations suitable for hiking, with real-time weather updates. 
+    \item Emma plans a picnic but wants to check the weather first. She enters "picnic" into the app, and it provides location options with weather updates for each location.
+    \item Emma needs safety advice for her hiking trip. The app suggests bringing plenty of water and wearing sunscreen, as the weather is hot. 
+    \item Emma wants her family to know her location in case of an emergency. She uses the emergency contact feature to share her location with her family. 
+\end{enumerate}
+
+\section*{Proposed Entities for the Domain}
+\begin{itemize}
+    \item \textbf{Event} \\
+    \textit{Attributes:} \\
+    - String type (e.g., "hiking" or "picnic") \\
+    - String location \\
+    - String weather \\
+    - String safetyTips
+    \item \textbf{Location} \\
+    \textit{Attributes:} \\
+    - String name \\
+    - String coordinates \\
+    - String weather
+    \item \textbf{User} \\
+    \textit{Attributes:} \\
+    - String name \\
+    - String emergencyContact
+\end{itemize}
+
+\section*{Scheduled Meeting Times + Mode of Communication}
+\begin{itemize}
+    \item Meeting time during lab: Monday at 11:00 AM
+    \item Mode of communication: Lab for weekly meetings, Social Media for daily communication
+\end{itemize}
+
+\end{document}
