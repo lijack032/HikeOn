@@ -3,21 +3,24 @@
 
 \begin{document}
 
-\section*{Name: name(To be changed later.)}
+\section*{Name: HikeOn}
 
 \section*{Domain}
 Outdoor event planning (picnics, hikes). The program helps users organize outdoor activities by providing location options, real-time weather data, and AI-driven safety tips.
 
 \section*{Software Specification}
-The program allows users to input an event type, such as "hiking" or "picnic," and shows nearby locations using Google Maps API. It provides real-time weather data for those locations using OpenWeather API. The program also generates AI-driven safety tips, such as "Bring sunscreen and water for warm weather," using OpenAI API. An additional optional feature is an emergency contact option, allowing users to send quick updates on their location to friends or family.
+The program allows users to input an event type, such as "hiking" or "picnic", etc and shows nearby locations using the Google Maps API. It provides real-time weather data for those locations using the OpenWeather API. The program also generates AI-driven safety tips, such as "Bring sunscreen and water for warm weather," using the OpenAI API. An additional optional feature is an emergency contact option, allowing users to send quick updates on their location to friends or family.
 
 \section*{User Stories}
 \begin{enumerate}
     \item Emma wants to go on a hike. She enters "hiking" into the app, and it shows her nearby locations suitable for hiking, with real-time weather updates. 
     \item Emma plans a picnic but wants to check the weather first. She enters "picnic" into the app, and it provides location options with weather updates for each location.
     \item Emma needs safety advice for her hiking trip. The app suggests bringing plenty of water and wearing sunscreen, as the weather is hot. 
-    \item Emma wants her family to know her location in case of an emergency. She uses the emergency contact feature to share her location with her family. 
+    \item  Emma wants to find a location that's ideal for both a picnic and a short hike. She enters "picnic and hiking" into the app, and it suggests locations that are suitable for both activities, along with weather updates and distance from her current location.
+    \item Emma has a free day and wants to do something outdoors, but she isn’t sure what activity would be suitable. She opens the app, which suggests activities based on the current weather, such as recommending a shaded trail on a hot day or a sheltered area if rain is expected.
 \end{enumerate}
+
+\newpage
 
 \section*{Proposed Entities for the Domain}
 \begin{itemize}
@@ -36,6 +39,12 @@ The program allows users to input an event type, such as "hiking" or "picnic," a
     \textit{Attributes:} \\
     - String name \\
     - String emergencyContact
+    \item \textbf{Weather} \\
+    \textit{Attributes:} \\
+    - Double temperature \\
+    - String condition (e.g., "Sunny," "Rainy") \\
+    - double windSpeed \\
+    - double humidity
 \end{itemize}
 
 \section*{Scheduled Meeting Times + Mode of Communication}
