@@ -1,24 +1,24 @@
 package frontend.controller;
 
-import frontend.view.panels.HomePanel;
+import frontend.view.panels.WeatherPanel;
+import backend.service.WeatherService;
 import frontend.model.Weather;
-import frontend.utils.APIUtils;
 
 public class WeatherController {
-    private HomePanel homePanel;
+    private final WeatherPanel weatherPanel;
+    private final WeatherService weatherService;
 
-    public WeatherController(HomePanel homePanel) {
-        this.homePanel = homePanel;
+    public WeatherController(WeatherPanel weatherPanel, WeatherService weatherService) {
+        this.weatherPanel = weatherPanel;
+        this.weatherService = weatherService;
+
+        // Update weather data when the controller is initialized
+        updateWeather();
     }
 
-    public void displayWeather() {
-        Weather weather = APIUtils.getCurrentWeather();
-        if (weather != null) {
-            homePanel.updateWeatherLabel(weather.getCondition(), weather.getTemperature());
-        }
-        else {
-            homePanel.updateWeatherLabel("Unable to load weather at this moment", "0");
-        }
+    public void updateWeather() {
+        // Fetch the latest weather data
+        Weather weather = weatherService.getCurrentWeather();
+        weatherPanel.updateWeather(weather); // Update the WeatherPanel with the fetched data
     }
-    
 }
