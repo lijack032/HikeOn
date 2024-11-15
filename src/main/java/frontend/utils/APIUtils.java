@@ -21,8 +21,10 @@ public class APIUtils {
         if (response != null && !response.isEmpty()) {
             JSONObject jsonResponse = new JSONObject(response);
             String condition = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("description");
-            int temperature = jsonResponse.getJSONObject("main").getInt("temp");
-            return new Weather(condition, temperature);
+            double temperature = jsonResponse.getJSONObject("main").getInt("temperature");
+            double humidity = jsonResponse.getJSONObject("main").getDouble("humidity");
+            double windSpeed = jsonResponse.getJSONObject("main").getDouble("Wind Speed");
+            return new Weather(condition, temperature, humidity, windSpeed);
         }
         return null;
     }
