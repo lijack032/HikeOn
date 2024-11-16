@@ -1,99 +1,59 @@
-package com.hikeon.frontend.view.panels;
+package frontend.view.panels;
 
 import javax.swing.*;
-import com.hikeon.frontend.controller.WeatherController;
-import com.hikeon.frontend.controller.LocationController;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import com.hikeon.frontend.model.Location;
 import java.util.List;
+import frontend.model.Location;
+import frontend.model.Weather;
 
 public class HomePanel extends JPanel {
-
-    private JLabel weatherLabel;
-    private JTextField searchBar;
+    private WeatherPanel weatherPanel;
+    private LocationPanel locationPanel;
+    private ChatbotPanel chatbotPanel;
+    private JTextField searchField;
     private JButton searchButton;
-    private JButton aiChatbotButton;
-    private JTextArea suggestionsArea;
-    private WeatherController weatherController;
-    private LocationController locationController;
 
     public HomePanel() {
-        this.weatherController = new WeatherController(this);
-        this.locationController = new LocationController(this);
-
-        setupLayout();
-    }
-
-    private void setupLayout() {
         setLayout(new BorderLayout());
 
-        // Top Panel for AI Chatbot Button
-        JPanel topPanel = new JPanel(new BorderLayout());
-        aiChatbotButton = new JButton("AI Chatbot");
-        aiChatbotButton.addActionListener(e -> openChatbot());
-        topPanel.add(aiChatbotButton, BorderLayout.EAST);
-        add(topPanel, BorderLayout.NORTH);
+        // Initialize panels
+        weatherPanel = new WeatherPanel();
+        locationPanel = new LocationPanel();
+        chatbotPanel = new ChatbotPanel();
 
-        // Center Panel for Weather and Search
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        // Search bar setup
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchField = new JTextField("Enter activity (e.g., hiking, picnic)");
+        searchButton = new JButton("Search");
 
-        // Weather Display
-        weatherLabel = new JLabel("Loading weather...");
-        weatherLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        centerPanel.add(weatherLabel);
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
 
-        // Search Bar
-        JPanel searchPanel = new JPanel(new FlowLayout());
-        searchBar = new JTextField(20);
-        searchButton = new JButton("Search Trails/Parks");
-        searchPanel.add(searchBar);
-        searchPanel.add(searchButton);
-
-        centerPanel.add(searchPanel);
-
-        // Suggestions Area
-        suggestionsArea = new JTextArea(10, 30);
-        suggestionsArea.setEditable(false);
-        centerPanel.add(new JScrollPane(suggestionsArea));
-
-        add(centerPanel, BorderLayout.CENTER);
-
-        // Search Button Action
-        searchButton.addActionListener(e -> locationController.handleSearch());
-    }
-
-    // Methods to update UI from controllers
-    public void updateWeatherLabel(String condition, int temperature) {
-        weatherLabel.setText("Current Weather: " + condition + ", " + temperature + "°C");
+        // Layout panels
+        add(weatherPanel, BorderLayout.NORTH);       // Weather info at the top
+        add(searchPanel, BorderLayout.CENTER);       // Search bar in the center
+        add(locationPanel, BorderLayout.SOUTH);      // Location results below
+        add(chatbotPanel, BorderLayout.EAST);        // Chatbot on the right
     }
 
     public String getSearchQuery() {
-        return searchBar.getText();
+        return searchField.getText();
     }
 
-    public void displaySearchResults(String message) {
-        suggestionsArea.setText(message);
+    public void setSearchButtonListener(ActionListener listener) {
+        searchButton.addActionListener(listener);
     }
 
-    public void displaySearchResults(List<Location> locations) {
-        suggestionsArea.setText(""); // Clear previous results
-        for (Location location : locations) {
-            suggestionsArea.append(location.getName() + "\n");
-        }
+    public void updateWeatherPanel(Weather weather) {
+        weatherPanel.updateWeather(weather);
     }
 
-    private void openChatbot() {
-        JOptionPane.showMessageDialog(this, "Opening Chatbot...");
-        // Chatbot logic to be added here
+    public void displayLocationResults(List<Location> locations) {
+        locationPanel.displayLocationResults(locations);
     }
 
-    public JButton getSearchButton() {
-        return searchButton;
-    }
-
-    public JButton getAiChatbotButton() {
-        return aiChatbotButton;
+    public ChatbotPanel getChatbotPanel() {
+        return chatbotPanel;
     }
 }
