@@ -3,7 +3,7 @@ package frontend.controller;
 import frontend.model.Location;
 import frontend.model.Weather;
 import frontend.view.panels.HomePanel;
-import backend.service.Location;
+import backend.service.LocationService;
 import backend.service.WeatherService;
 import backend.service.ChatbotService;
 
@@ -45,5 +45,4 @@ public class MainController {
         homePanel.getChatbotPanel().appendMessage("AI: " + chatbotResponse);
     }
 
-    // Additional methods could be added for other interactions as needed
 }
