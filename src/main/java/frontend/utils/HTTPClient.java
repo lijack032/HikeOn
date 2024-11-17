@@ -3,38 +3,66 @@ package frontend.utils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
-public class HTTPClient {
+/**
+ * HTTP client utility class.
+ *
+ * @null
+ */
+public class HttpClient {
 
-    // Method to send a GET request to the API
+    /**
+     * Timeout value for the connection and read operations in milliseconds.
+     */
+    private static final int TIMEOUT = 5000;
+
+    /**
+     * Sends a GET request to the specified URL and returns the response as a string.
+     *
+     * @param urlString the URL to send the GET request to
+     * @return the response from the API as a string
+     */
     public static String sendGetRequest(String urlString) {
-        StringBuilder response = new StringBuilder();
+        final StringBuilder response = new StringBuilder();
         try {
             // Create a URL object from the string
-            URL url = new URL(new URI(urlString).toASCIIString());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            final URL url = new URI(urlString).toURL();
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000); // Timeout after 5 seconds
-            connection.setReadTimeout(5000);    // Timeout while reading data
+            // Set the connection and read timeouts
+            connection.setConnectTimeout(TIMEOUT);
+            // Timeout while reading data
+            connection.setReadTimeout(TIMEOUT);
 
             // Get the response code
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) { // 200 OK
+            final int responseCode = connection.getResponseCode();
+            // If the response code is OK, read the response
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 // Read the response
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
                 }
                 in.close();
-            } else {
+            } 
+            else {
                 System.out.println("GET request failed. Response Code: " + responseCode);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } 
+        catch (java.net.MalformedURLException malformedUrlException) {
+            malformedUrlException.printStackTrace();
+        } 
+        catch (java.net.URISyntaxException uriSyntaxException) {
+            uriSyntaxException.printStackTrace();
         }
-        return response.toString(); // Return the API response as a string
+        catch (java.io.IOException ioException) {
+            ioException.printStackTrace();
+        }
+        // Return the API response as a string
+        return response.toString();
     }
 }
 
