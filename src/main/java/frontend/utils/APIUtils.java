@@ -4,13 +4,15 @@ import frontend.model.Weather;
 import frontend.model.Location;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import io.github.cdimascio.dotenv.Dotenv;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class APIUtils {
 
-    private static final String WEATHER_API_KEY = "your-weather-api-key";
+    private static final String WEATHER_API_KEY = dotenv.get("OPENWEATHER_API_KEY");;
     private static final String WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + WEATHER_API_KEY + "&units=metric";
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
 
