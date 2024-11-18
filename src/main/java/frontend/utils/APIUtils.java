@@ -14,7 +14,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  * Utility class for API operations.
  * @null
  */
-public class ApiUtils {
+public class APIUtils {
 
     private static final String WEATHER_API_KEY = Dotenv.get("OPENWEATHER_API_KEY");
     private static final String WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" 
@@ -38,6 +38,10 @@ public class ApiUtils {
             weather = new Weather(condition, temperature, humidity, windSpeed);
         }
         return weather;
+        }
+
+    public static String get_weather_API_URL() {
+        return WEATHER_API_URL;
     }
 
     /**
