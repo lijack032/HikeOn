@@ -1,24 +1,34 @@
 package frontend.controller;
 
-import frontend.view.panels.HomePanel;
+import backend.service.WeatherService;
 import frontend.model.Weather;
-import frontend.utils.APIUtils;
+import frontend.view.panels.WeatherPanel;
 
+/**
+ * Controller for managing weather data and updating the weather panel.
+ *
+ * @null This class does not accept null values for its dependencies.
+ */
 public class WeatherController {
-    private HomePanel homePanel;
+    private final WeatherPanel weatherPanel;
+    private final WeatherService weatherService;
 
-    public WeatherController(HomePanel homePanel) {
-        this.homePanel = homePanel;
+    public WeatherController(WeatherPanel weatherPanel, WeatherService weatherService) {
+        this.weatherPanel = weatherPanel;
+        this.weatherService = weatherService;
+
+        // Update weather data when the controller is initialized
+        updateWeather();
     }
 
-    public void displayWeather() {
-        Weather weather = APIUtils.getCurrentWeather();
-        if (weather != null) {
-            homePanel.updateWeatherLabel(weather.getCondition(), weather.getTemperature());
-        }
-        else {
-            homePanel.updateWeatherLabel("Unable to load weather at this moment", "0");
-        }
+    /**
+     * Updates the weather data by fetching the latest information from the weather service
+     * and updating the weather panel.
+     */
+    public void updateWeather() {
+        // Fetch the latest weather data
+        final Weather weather = weatherService.getCurrentWeather();
+        // Update the WeatherPanel with the fetched data
+        weatherPanel.updateWeather(weather);
     }
-    
 }
