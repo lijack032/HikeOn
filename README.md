@@ -14,7 +14,7 @@
     Utilizing OpenWeather for accurate forecasts, Google Maps for nearby locations, and the OpenAI API for intelligent real-time advice, HikeOne ensures that users have everything they need for a successful outing. Whether you’re a seasoned hiker or planning a casual day out, HikeOn is your all-in-one solution for safe and memorable outdoor experiences.
 
 User Story division
-1) Emma wants to go on a hike. She enters "hiking" into the app, and it shows her nearby locations suitable for hiking, with real-time weather updates.
+1) Emma wants to go on a hike. She enters "hiking" into the app, and it shows her nearby locations suitable for hiking, with real-time weather updates.(Jack Li - User Story)
    
 2) Emma plans a picnic but wants to check the weather first. She enters "picnic" into the app, and it provides location options with weather updates for each location. (Vaibhav Gupta - User Story)
    
