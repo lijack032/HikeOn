@@ -11,7 +11,7 @@ import java.net.URL;
  *
  * @null
  */
-public class HTTPClient {
+public class HttpClient {
 
     /**
      * Timeout value for the connection and read operations in milliseconds.
