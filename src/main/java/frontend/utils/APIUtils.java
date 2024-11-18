@@ -16,25 +16,31 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 public class ApiUtils {
 
-    private static final String WEATHER_API_KEY = Dotenv.get("OPENWEATHER_API_KEY");
-    private static final String WEATHER_API_URL = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" 
-            + WEATHER_API_KEY + "&units=metric";
+    private static final Dotenv DOTENV = Dotenv.load();
+
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
+
+    private static final String WEATHER_API_KEY = DOTENV.get("OPENWEATHER_API_KEY");
+
+    private static final String WEATHER_API_URL = "https://openweathermap.org/api" 
+            + WEATHER_API_KEY + "&units=metric";
+
+    private static final String MAIN_KEY = "main";
 
     /**
      * Fetches the current weather for Toronto.
      * @return Weather object containing the current weather details or null if the response is empty.
      */
     public static Weather fetchCurrentWeather() {
-        final String response = HTTPClient.sendGetRequest(WEATHER_API_URL);
+        final String response = HttpClient.sendGetRequest(WEATHER_API_URL);
         Weather weather = null;
 
         if (response != null && !response.isEmpty()) {
             final JSONObject jsonResponse = new JSONObject(response);
             final String condition = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("description");
-            final double temperature = jsonResponse.getJSONObject("main").getDouble("temp");
-            final double humidity = jsonResponse.getJSONObject("main").getDouble("humidity");
-            final double windSpeed = jsonResponse.getJSONObject("main").getDouble("Wind Speed");
+            final double temperature = jsonResponse.getJSONObject(MAIN_KEY).getDouble("temp");
+            final double humidity = jsonResponse.getJSONObject(MAIN_KEY).getDouble("humidity");
+            final double windSpeed = jsonResponse.getJSONObject(MAIN_KEY).getDouble("Wind Speed");
             weather = new Weather(condition, temperature, humidity, windSpeed);
         }
         return weather;
@@ -46,7 +52,7 @@ public class ApiUtils {
      * @return A list of Location objects based on the search query.
      */
     public static List<Location> fetchNearbyLocations(String query) {
-        final String response = HTTPClient.sendGetRequest(LOCATION_API_URL + query);
+        final String response = HttpClient.sendGetRequest(LOCATION_API_URL + query);
 
         final List<Location> locations = new ArrayList<>();
         if (response != null && !response.isEmpty()) {
