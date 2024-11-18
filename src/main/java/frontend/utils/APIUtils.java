@@ -38,10 +38,6 @@ public class APIUtils {
             weather = new Weather(condition, temperature, humidity, windSpeed);
         }
         return weather;
-        }
-
-    public static String get_weather_API_URL() {
-        return WEATHER_API_URL;
     }
 
     /**

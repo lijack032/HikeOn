@@ -22,7 +22,7 @@ public class MainController {
     private final ChatbotService chatbotService;
 
     public MainController(HomePanel homePanel, WeatherService weatherService, 
-                          LocationService locationService, ChatbotService chatbotService) {
+                          LocationService locationService, ChatbotService chatbotService) throws IOException {
         this.homePanel = homePanel;
         this.weatherService = weatherService;
         this.locationService = locationService;
