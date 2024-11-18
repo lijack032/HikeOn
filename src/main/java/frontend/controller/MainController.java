@@ -1,5 +1,6 @@
 package frontend.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import backend.service.ChatbotService;
@@ -21,7 +22,7 @@ public class MainController {
     private final ChatbotService chatbotService;
 
     public MainController(HomePanel homePanel, WeatherService weatherService, 
-                          LocationService locationService, ChatbotService chatbotService) {
+                          LocationService locationService, ChatbotService chatbotService) throws IOException {
         this.homePanel = homePanel;
         this.weatherService = weatherService;
         this.locationService = locationService;
@@ -45,7 +46,7 @@ public class MainController {
     /**
      * Updates the weather data and displays it in the HomePanel's WeatherPanel.
      */
-    public void updateWeatherData() {
+    public void updateWeatherData() throws IOException {
         final Weather currentWeather = weatherService.getCurrentWeather();
         homePanel.updateWeatherPanel(currentWeather);
     }
