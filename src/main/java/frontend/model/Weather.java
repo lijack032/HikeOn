@@ -1,5 +1,10 @@
 package frontend.model;
 
+/**
+ * Represents the weather conditions.
+ * 
+ * @null
+ */
 public class Weather {
     private String condition;
     private double temperature;

@@ -1,8 +1,16 @@
 package frontend.view.panels;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import frontend.model.Weather;
 
+/**
+ * WeatherPanel displays weather information.
+ * 
+ * @null This class does not accept null values.
+ */
 public class WeatherPanel extends JPanel {
     private JLabel conditionLabel;
     private JLabel temperatureLabel;
@@ -23,9 +31,14 @@ public class WeatherPanel extends JPanel {
         add(windSpeedLabel);
     }
 
+    /**
+     * Updates the weather information displayed on the panel.
+     *
+     * @param weather the Weather object containing updated weather information
+     */
     public void updateWeather(Weather weather) {
         conditionLabel.setText("Condition: " + weather.getCondition());
-        temperatureLabel.setText("Temperature: " + weather.getTemperature() + "°C");
+        temperatureLabel.setText("Temperature: " + weather.getTemperature() + " degrees C");
         humidityLabel.setText("Humidity: " + weather.getHumidity() + "%");
         windSpeedLabel.setText("Wind Speed: " + weather.getWindSpeed() + " km/h");
     }

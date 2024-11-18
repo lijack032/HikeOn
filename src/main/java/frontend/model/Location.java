@@ -1,5 +1,10 @@
 package frontend.model;
 
+/**
+ * Represents a location with a name.
+ * 
+ * @null
+ */
 public class Location {
     private String name;
 
