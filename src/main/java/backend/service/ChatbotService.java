@@ -6,6 +6,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service for handling chatbot operations using OpenAI GPT-4o mini.
@@ -110,8 +112,15 @@ public class ChatbotService {
      * @return The chatbot's response text.
      */
     private String extractResponse(String responseBody) {
-        // A simple placeholder parsing logic for testing
-        // Update with actual JSON parsing once API response format is known
-        return "Sample AI Response (update with parsing logic).";
+        // Use a JSON library like Jackson or Gson to parse the response
+        // Assuming the response contains a field "choices" which is a list, and inside that "text"
+        try {
+            JsonNode rootNode = new ObjectMapper().readTree(responseBody);
+            String chatbotResponse = rootNode.path("choices").get(0).path("message").path("content").asText();
+            return chatbotResponse;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error parsing response.";
+        }
     }
 }
