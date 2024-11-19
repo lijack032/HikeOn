@@ -1,70 +1,75 @@
 package frontend.view.panels;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
-/**
- * ChatbotPanel is a JPanel that contains a chat area, user input field, and send button.
- * 
- * @null
- */
+import javax.swing.*;
+import java.awt.*;
 public class ChatbotPanel extends JPanel {
-    private JTextArea chatArea;
-    private JTextField userInputField;
-    private JButton sendButton;
+    private final JTextArea conversationArea; // Text area to display conversation
+    private final JTextField inputField;      // Text field for user input
+    private final JButton sendButton;         // Button to send message
 
     public ChatbotPanel() {
         setLayout(new BorderLayout());
 
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
-        final JScrollPane chatScrollPane = new JScrollPane(chatArea);
+        // Initialize the conversation area
+        conversationArea = new JTextArea(20, 40);
+        conversationArea.setEditable(false);  // Make conversation area read-only
+        conversationArea.setLineWrap(true);
+        conversationArea.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(conversationArea);
 
-        userInputField = new JTextField();
+        // Initialize the input field for user messages
+        inputField = new JTextField(40);
+
+        // Initialize the send button
         sendButton = new JButton("Send");
 
-        final JPanel inputPanel = new JPanel(new BorderLayout());
-        inputPanel.add(userInputField, BorderLayout.CENTER);
-        inputPanel.add(sendButton, BorderLayout.EAST);
+        // Add components to the panel
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(inputField, BorderLayout.CENTER);
+        bottomPanel.add(sendButton, BorderLayout.EAST);
 
-        add(chatScrollPane, BorderLayout.CENTER);
-        add(inputPanel, BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
     }
 
     /**
-     * Retrieves the text from the user input field and clears it.
+     * Displays the conversation history in the conversation area.
+     *
+     * @param conversationText the full conversation as a single string
+     */
+    public void displayConversation(String conversationText) {
+        conversationArea.setText(conversationText);
+    }
+
+    /**
+     * Clears the conversation history from the panel.
+     */
+    public void clearConversation() {
+        conversationArea.setText("");
+    }
+
+    /**
+     * Adds a listener to the send button for sending user messages.
      * 
-     * @return the text from the user input field
+     * @param actionListener the listener to handle button click events
+     */
+    public void addSendButtonListener(java.awt.event.ActionListener actionListener) {
+        sendButton.addActionListener(actionListener);
+    }
+
+    /**
+     * Gets the text entered by the user in the input field.
+     *
+     * @return the user's input message
      */
     public String getUserInput() {
-        final String input = userInputField.getText();
-        userInputField.setText("");
-        return input;
+        return inputField.getText();
     }
 
     /**
-     * Appends a message to the chat area.
-     * 
-     * @param message the message to append
+     * Clears the input field after the user sends a message.
      */
-    public void appendMessage(String message) {
-        chatArea.append(message + "\n");
-    }
-
-    /**
-     * Sets the ActionListener for the send button.
-     * 
-     * @param listener the ActionListener to set
-     */
-    public void setSendButtonListener(ActionListener listener) {
-        sendButton.addActionListener(listener);
+    public void clearInputField() {
+        inputField.setText("");
     }
 }
