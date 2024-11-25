@@ -3,7 +3,7 @@ package backend.service;
 import java.io.IOException;
 
 import frontend.model.Weather;
-import frontend.utils.APIUtils;
+import frontend.utils.ApiUtils;
 
 /**
  * Service class responsible for fetching and managing weather data.
@@ -28,19 +28,18 @@ public class WeatherService {
      * Error Handling:
      * - Logs errors to the console in case of exceptions during the API call.
      * - Uses a default Weather object when the API returns null or fails.
+     * @param city is the location that the user wants to check the weather of.
+     * @throws IllegalArgumentException if the api call has gone wrong.
      */
-    public void updateWeather() {
+    public void updateWeather(String city) {
         try {
-            final Weather fetchedWeather = APIUtils.fetchCurrentWeather();
+            final Weather fetchedWeather = ApiUtils.fetchCurrentWeather(city);
             if (fetchedWeather == null) {
                 handleFallbackWeather("API returned null data.");
             }
             else {
                 currentWeather = fetchedWeather;
             }
-        }
-        catch (IOException exception) {
-            handleFallbackWeather("Error during API call: " + exception.getMessage());
         }
         catch (IllegalStateException exception) {
             handleFallbackWeather("Unexpected state: " + exception.getMessage());
@@ -52,10 +51,11 @@ public class WeatherService {
      * or unavailable. If the update fails, a default fallback Weather object is returned.
      *
      * @return the current Weather object, guaranteed to be non-null.
+     * @param city is the location that the user wants to check the weather of.
      */
-    public Weather getCurrentWeather() {
+    public Weather getCurrentWeather(String city) {
         if (currentWeather == null) {
-            updateWeather();
+            updateWeather(city);
         }
         return currentWeather;
     }

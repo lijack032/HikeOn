@@ -12,7 +12,7 @@ import frontend.view.panels.HomePanel;
 
 /**
  * MainController class to handle the main operations of the application.
- * 
+ *
  * @null This class does not accept null values for its dependencies.
  */
 public class MainController {
@@ -21,15 +21,22 @@ public class MainController {
     private final LocationService locationService;
     private final ChatbotService chatbotService;
 
-    public MainController(HomePanel homePanel, WeatherService weatherService, 
+    /**
+     * Constructs the MainController with its dependencies and initializes
+     * the weather display when the app starts.
+     *
+     * @param homePanel the main panel of the application
+     * @param weatherService the service for fetching weather data
+     * @param locationService the service for location-related operations
+     * @param chatbotService the service for chatbot interactions
+     * @throws IOException if there is an issue during initialization
+     */
+    public MainController(HomePanel homePanel, WeatherService weatherService,
                           LocationService locationService, ChatbotService chatbotService) throws IOException {
         this.homePanel = homePanel;
         this.weatherService = weatherService;
         this.locationService = locationService;
         this.chatbotService = chatbotService;
-
-        // Initialize the weather display when the app starts
-        updateWeatherData();
     }
 
     /**
@@ -44,11 +51,20 @@ public class MainController {
     }
 
     /**
-     * Updates the weather data and displays it in the HomePanel's WeatherPanel.
+     * Updates the weather data for the specified city and displays it in the HomePanel's WeatherPanel.
+     *
+     * @param city the name of the city for which to fetch and display weather data
+     * @throws IOException if there is an issue during the weather data update
+     * @throws IllegalArgumentException if the city name is wrongly entered
      */
-    public void updateWeatherData() throws IOException {
-        final Weather currentWeather = weatherService.getCurrentWeather();
-        homePanel.updateWeatherPanel(currentWeather);
+    public void updateWeatherData(String city) throws IOException {
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("City name cannot be null or empty.");
+        }
+        final Weather currentWeather = weatherService.getCurrentWeather(city.trim());
+        if (currentWeather != null) {
+            homePanel.updateWeatherPanel(currentWeather);
+        }
     }
 
     /**
@@ -61,5 +77,4 @@ public class MainController {
         homePanel.getChatbotPanel().appendMessage("User: " + userMessage);
         homePanel.getChatbotPanel().appendMessage("AI: " + chatbotResponse);
     }
-
 }

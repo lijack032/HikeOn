@@ -3,12 +3,11 @@ package frontend.view;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import backend.service.WeatherService;
 import frontend.view.panels.HomePanel;
 
 /**
  * MainFrame class for the HikeOn application.
- * 
- * @null
  */
 public class MainFrame extends JFrame {
 
@@ -20,16 +19,22 @@ public class MainFrame extends JFrame {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        final WeatherService weatherService = new WeatherService();
+
         final HomePanel homePanel = new HomePanel();
         setContentPane(homePanel);
 
         // Center the frame on the screen
         setLocationRelativeTo(null);
+
+        // Fetch weather data for a dynamic city
+        String city = "Toronto";
+        weatherService.updateWeather(city);
     }
 
     /**
      * The main method to start the HikeOn application.
-     * 
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
