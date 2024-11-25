@@ -19,7 +19,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 public class ApiUtils {
 
-    private static final String WEATHER_API_KEY = "7c49878c18fe506669243c238670b9ff";
+    private static final String WEATHER_API_KEY = Dotenv.load().get("OPENWEATHER_API_KEY");
     private static final String WEATHER_API_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
 
