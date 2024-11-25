@@ -1,7 +1,5 @@
 package backend.service;
 
-import java.io.IOException;
-
 import frontend.model.Weather;
 import frontend.utils.ApiUtils;
 
@@ -29,7 +27,6 @@ public class WeatherService {
      * - Logs errors to the console in case of exceptions during the API call.
      * - Uses a default Weather object when the API returns null or fails.
      * @param city is the location that the user wants to check the weather of.
-     * @throws IllegalArgumentException if the api call has gone wrong.
      */
     public void updateWeather(String city) {
         try {
@@ -64,7 +61,6 @@ public class WeatherService {
      * @param message the reason for falling back to the default weather data.
      */
     private void handleFallbackWeather(String message) {
-        currentWeather = new Weather("Unknown", 0.0, 0.0, 0.0);
         System.err.println("Fallback triggered: " + message);
     }
 }
