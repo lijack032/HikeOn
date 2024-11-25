@@ -1,8 +1,10 @@
 package frontend.utils;
 
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +56,7 @@ public class ApiUtils {
             System.err.println("Error fetching weather data for city: " + city + ". " + exception.getMessage());
             return null;
         }
+
     }
 
     /**
