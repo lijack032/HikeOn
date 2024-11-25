@@ -54,9 +54,7 @@ public class WeatherService {
      * @param city is the location that the user wants to check the weather of.
      */
     public Weather getCurrentWeather(String city) {
-        if (currentWeather == null) {
-            updateWeather(city);
-        }
+        updateWeather(city);
         return currentWeather;
     }
 

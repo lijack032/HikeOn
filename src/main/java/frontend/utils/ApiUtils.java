@@ -15,11 +15,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Utility class for API operations.
- * @null
  */
 public class ApiUtils {
 
-    private static final String WEATHER_API_KEY = Dotenv.load().get("OPENWEATHER_API_KEY");
+    private static final String WEATHER_API_KEY = "7c49878c18fe506669243c238670b9ff";
     private static final String WEATHER_API_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
 
@@ -36,8 +35,7 @@ public class ApiUtils {
         }
 
         try {
-            final String encodedCity = URLEncoder.encode(city, StandardCharsets.UTF_8.toString());
-            final String url = WEATHER_API_BASE_URL + "?q=" + encodedCity + "&appid=" + WEATHER_API_KEY + "&units=metric";
+            final String url = WEATHER_API_BASE_URL + "?q=" + city + "&appid=" + WEATHER_API_KEY + "&units=metric";
 
             final String response = HttpClient.sendGetRequest(url);
             Weather weather = null;
@@ -51,11 +49,6 @@ public class ApiUtils {
                 weather = new Weather(condition, temperature, humidity, windSpeed);
             }
             return weather;
-
-        }
-        catch (UnsupportedEncodingException exception) {
-            System.err.println("Encoding error for city: " + city + ". " + exception.getMessage());
-            return null;
         }
         catch (IllegalArgumentException exception) {
             System.err.println("Error fetching weather data for city: " + city + ". " + exception.getMessage());
