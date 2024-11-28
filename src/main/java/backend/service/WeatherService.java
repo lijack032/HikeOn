@@ -1,7 +1,7 @@
 package backend.service;
 
 import frontend.model.Weather;
-import frontend.utils.APIUtils;
+import frontend.utils.ApiUtils;
 
 /**
  * Service class for managing and fetching weather data.
@@ -26,7 +26,7 @@ public class WeatherService {
      */
     public void updateWeather() {
         try {
-            currentWeather = APIUtils.fetchCurrentWeather();
+            currentWeather = ApiUtils.fetchCurrentWeather();
             if (currentWeather == null) {
                 // Fallback or default weather data
                 currentWeather = new Weather("Unknown", 0.0, 0.0, "N/A");
