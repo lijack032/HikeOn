@@ -1,10 +1,5 @@
 package frontend.utils;
 
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +15,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 public class ApiUtils {
 
-    private static final String WEATHER_API_KEY = "7c49878c18fe506669243c238670b9ff";
+    private static final String WEATHER_API_KEY = Dotenv.load().get("OPENWEATHER_API_KEY");
     private static final String WEATHER_API_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
 
@@ -36,11 +31,11 @@ public class ApiUtils {
             throw new IllegalArgumentException("City name cannot be null or empty.");
         }
 
+        Weather weather = null;
         try {
             final String url = WEATHER_API_BASE_URL + "?q=" + city + "&appid=" + WEATHER_API_KEY + "&units=metric";
 
             final String response = HttpClient.sendGetRequest(url);
-            Weather weather = null;
 
             if (!response.isEmpty()) {
                 final JSONObject jsonResponse = new JSONObject(response);
@@ -50,13 +45,11 @@ public class ApiUtils {
                 final double windSpeed = jsonResponse.getJSONObject("wind").getDouble("speed");
                 weather = new Weather(condition, temperature, humidity, windSpeed);
             }
-            return weather;
         }
         catch (IllegalArgumentException exception) {
             System.err.println("Error fetching weather data for city: " + city + ". " + exception.getMessage());
-            return null;
         }
-
+        return weather;
     }
 
     /**

@@ -23,6 +23,7 @@ public class WeatherService {
     private static final String API_KEY = "7c49878c18fe506669243c238670b9ff\n";  // Replace with your actual API key
     private static final String FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
+
     private final OkHttpClient client = new OkHttpClient();
 
     // Method to get a 3-day weather forecast
