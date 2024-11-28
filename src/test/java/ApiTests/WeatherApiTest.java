@@ -1,5 +1,4 @@
-
-package ApiTests;
+package apitests;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,7 +12,7 @@ public class WeatherApiTest {
 
     @Test
     void testFetchCurrentWeatherRealApi() {
-        final Weather weather = ApiUtils.fetchCurrentWeather();
+        final Weather weather = ApiUtils.fetchCurrentWeather("yourArgumentHere");
 
         // Ensure the response is not null
         assertNotNull(weather);

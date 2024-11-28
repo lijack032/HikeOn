@@ -5,6 +5,12 @@ import backend.service.ChatbotService;
 import backend.service.WeatherService;
 import frontend.view.panels.ChatbotPanel;
 
+
+
+/**
+ * MainFrame class for the HikeOn application. This class is the main entry point for the application
+ */
+
 public class MainFrame extends JFrame {
 
     private static final int FRAME_WIDTH = 800;
@@ -51,6 +57,13 @@ public class MainFrame extends JFrame {
 
         // Center the frame on the screen
         setLocationRelativeTo(null);
+
+
+
+        // Fetch weather data for a dynamic city
+        final String city = "Toronto";
+        weatherService.updateWeather(city);
+
     }
 
     public static void main(String[] args) {
