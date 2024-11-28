@@ -1,10 +1,10 @@
 package frontend.controller;
 
+import java.io.IOException;
+
 import backend.service.WeatherService;
 import frontend.model.Weather;
 import frontend.view.panels.WeatherPanel;
-
-import java.io.IOException;
 
 /**
  * Controller for managing weather data and updating the weather panel.
