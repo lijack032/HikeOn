@@ -9,7 +9,6 @@ import java.awt.Insets;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,6 +28,7 @@ public class MainFrame {
     private static final int TITLE_COLOR_GREEN = 139;
     private static final int TITLE_COLOR_BLUE = 34;
     private static final int LABEL_FONT_SIZE = 16;
+    private static final int LOCATION_FONT_SIZE = 16;
 
     private static final int INSET_SIZE = 10;
 
@@ -43,12 +43,10 @@ public class MainFrame {
         frame.add(createCenterPanel(), BorderLayout.CENTER);
         frame.add(createFooterPanel(), BorderLayout.SOUTH);
         frame.setVisible(true);
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(getInsetSize(), getInsetSize(), getInsetSize(), getInsetSize());
     }
 
     private static JFrame createMainFrame() {
-        final JFrame frame = new JFrame("HikeOn - Outdoor Event Planner");
+        final JFrame frame = new JFrame("HikeOn Outdoor Event Planner");
         final int frameWidth = 600;
         final int frameHeight = 600;
         frame.setSize(frameWidth, frameHeight);
@@ -61,7 +59,6 @@ public class MainFrame {
         final JLabel titleLabel = new JLabel("HikeOn");
         titleLabel.setForeground(new Color(TITLE_COLOR_RED, TITLE_COLOR_GREEN, TITLE_COLOR_BLUE));
         titleLabel.setFont(new Font(FONT_NAME, Font.BOLD, TITLE_FONT_SIZE));
-        titleLabel.setForeground(new Color(TITLE_COLOR_RED, TITLE_COLOR_GREEN, TITLE_COLOR_BLUE));
         final JPanel titlePanel = new JPanel();
         titlePanel.add(titleLabel);
         return titlePanel;
@@ -73,7 +70,6 @@ public class MainFrame {
         centerPanel.setBorder(BorderFactory.createEmptyBorder(borderSize, borderSize, borderSize, borderSize));
         final GridBagConstraints gbc = createGridBagConstraints();
 
-        addEventTypeComponents(centerPanel, gbc);
         addLocationComponents(centerPanel, gbc);
         addWeatherComponents(centerPanel, gbc);
         addButtons(centerPanel, gbc);
@@ -92,26 +88,13 @@ public class MainFrame {
         return gbc;
     }
 
-    private static void addEventTypeComponents(JPanel panel, GridBagConstraints gbc) {
-        final JLabel eventLabel = new JLabel("Event Type:");
-        eventLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LABEL_FONT_SIZE));
-        final String[] events = {"Hiking", "Picnic"};
-        final JComboBox<String> eventComboBox = new JComboBox<>(events);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(eventLabel, gbc);
-        gbc.gridx = 1;
-        panel.add(eventComboBox, gbc);
-    }
-
     private static void addLocationComponents(JPanel panel, GridBagConstraints gbc) {
         final JLabel locationLabel = new JLabel("Location:");
-        locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, 16));
+        locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LOCATION_FONT_SIZE));
         final JTextField locationField = new JTextField(15);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         panel.add(locationLabel, gbc);
         gbc.gridx = 1;
         panel.add(locationField, gbc);
@@ -119,11 +102,12 @@ public class MainFrame {
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
         final JLabel weatherLabel = new JLabel("Weather: ");
-        weatherLabel.setFont(new Font(FONT_NAME, Font.BOLD, 16));
+        final int weatherFontSize = 16;
+        weatherLabel.setFont(new Font(FONT_NAME, Font.BOLD, weatherFontSize));
         weatherLabel.setForeground(Color.BLUE);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         gbc.gridwidth = 2;
         panel.add(weatherLabel, gbc);
     }
@@ -133,7 +117,7 @@ public class MainFrame {
                 new Color(100, 149, 237));
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(fetchWeatherButton, gbc);
 
@@ -141,10 +125,17 @@ public class MainFrame {
                 new Color(60, 179, 113));
 
         gbc.gridx = 0;
-        final int buttonRow = 4;
-        gbc.gridy = buttonRow;
+        gbc.gridy = 3;
         gbc.gridwidth = 2;
         panel.add(googleMapsButton, gbc);
+
+        final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
+                new Color(255, 200, 0));
+        
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        panel.add(hikeOnAIButton, gbc);
     }
 
     private static JPanel createFooterPanel() {
@@ -157,6 +148,25 @@ public class MainFrame {
 
     private static JButton createStyledButton(String text, Color defaultColor, Color hoverColor) {
         final JButton button = new JButton(text);
+        button.setBackground(defaultColor);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font(FONT_NAME, Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(defaultColor));
+
+        // Hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultColor);
+            }
+        });
+
         return button;
     }
 }
