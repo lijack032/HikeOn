@@ -28,11 +28,7 @@ public class WeatherService {
      * - Uses a default Weather object when the API returns null or fails.
      * @param city is the location that the user wants to check the weather of.
      */
-    public void updateWeather(String city) {
-        try {
-            final Weather fetchedWeather = ApiUtils.fetchCurrentWeather(city);
-            if (fetchedWeather == null) {
-                handleFallbackWeather("API returned null data.");
+
             }
             else {
                 currentWeather = fetchedWeather;
