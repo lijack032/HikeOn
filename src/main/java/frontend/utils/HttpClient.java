@@ -2,9 +2,7 @@ package frontend.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 
 /**
  * HTTP client utility class.
@@ -18,6 +16,7 @@ public class HttpClient {
      */
     private static final int TIMEOUT = 5000;
 
+
     /**
      * Sends a GET request to the specified URL and returns the response as a string.
      *
@@ -28,7 +27,7 @@ public class HttpClient {
         final StringBuilder response = new StringBuilder();
         try {
             // Create a URL object from the string
-            final URL url = new URI(urlString).toURL();
+            final URL url = UrlConverter.convertToUrl(urlString);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             // Set the connection and read timeouts
@@ -54,9 +53,6 @@ public class HttpClient {
         } 
         catch (java.net.MalformedURLException malformedUrlException) {
             malformedUrlException.printStackTrace();
-        } 
-        catch (java.net.URISyntaxException uriSyntaxException) {
-            uriSyntaxException.printStackTrace();
         }
         catch (java.io.IOException ioException) {
             ioException.printStackTrace();
