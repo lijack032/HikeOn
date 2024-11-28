@@ -40,5 +40,5 @@ bin/
 /dataSources/
 /dataSources.local.xml
 
-# OpenWeather API key
-OpenWeatherKey.env
+# ignore .env files
+*.env

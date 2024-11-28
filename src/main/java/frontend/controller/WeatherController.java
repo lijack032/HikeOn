@@ -19,17 +19,16 @@ public class WeatherController {
         this.weatherPanel = weatherPanel;
         this.weatherService = weatherService;
 
-        // Update weather data when the controller is initialized
-        updateWeather();
     }
 
     /**
      * Updates the weather data by fetching the latest information from the weather service
      * and updating the weather panel.
+     * @param city is the location that the user wants to check the weather of.
      */
-    public void updateWeather() throws IOException {
+    public void updateWeather(String city) {
         // Fetch the latest weather data
-        final Weather weather = weatherService.getCurrentWeather();
+        final Weather weather = weatherService.getCurrentWeather(city);
         // Update the WeatherPanel with the fetched data
         weatherPanel.updateWeather(weather);
     }
