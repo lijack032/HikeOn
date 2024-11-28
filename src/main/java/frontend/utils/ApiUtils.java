@@ -1,5 +1,10 @@
 package frontend.utils;
 
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,38 +17,46 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Utility class for API operations.
- * @null
  */
 public class ApiUtils {
 
-    private static final Dotenv DOTENV = Dotenv.load();
-
+    private static final String WEATHER_API_KEY = "7c49878c18fe506669243c238670b9ff";
+    private static final String WEATHER_API_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
     private static final String LOCATION_API_URL = "https://api.example.com/locations?query=";
 
-    private static final String WEATHER_API_KEY = DOTENV.get("OPENWEATHER_API_KEY");
-
-    private static final String WEATHER_API_URL = "https://openweathermap.org/api" 
-            + WEATHER_API_KEY + "&units=metric";
-
-    private static final String MAIN_KEY = "main";
-
     /**
-     * Fetches the current weather for Toronto.
-     * @return Weather object containing the current weather details or null if the response is empty.
+     * Fetches the current weather for a given city.
+     *
+     * @param city The city for which to fetch weather data.
+     * @return Weather object containing the current weather details, or null if the response is empty or invalid.
+     * @throws IllegalArgumentException If the city name is null or empty.
      */
-    public static Weather fetchCurrentWeather() {
-        final String response = HttpClient.sendGetRequest(WEATHER_API_URL);
-        Weather weather = null;
-
-        if (response != null && !response.isEmpty()) {
-            final JSONObject jsonResponse = new JSONObject(response);
-            final String condition = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("description");
-            final double temperature = jsonResponse.getJSONObject(MAIN_KEY).getDouble("temp");
-            final double humidity = jsonResponse.getJSONObject(MAIN_KEY).getDouble("humidity");
-            final double windSpeed = jsonResponse.getJSONObject(MAIN_KEY).getDouble("Wind Speed");
-            weather = new Weather(condition, temperature, humidity, windSpeed);
+    public static Weather fetchCurrentWeather(String city) {
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("City name cannot be null or empty.");
         }
-        return weather;
+
+        try {
+            final String url = WEATHER_API_BASE_URL + "?q=" + city + "&appid=" + WEATHER_API_KEY + "&units=metric";
+
+            final String response = HttpClient.sendGetRequest(url);
+            Weather weather = null;
+
+            if (!response.isEmpty()) {
+                final JSONObject jsonResponse = new JSONObject(response);
+                final String condition = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("description");
+                final double temperature = jsonResponse.getJSONObject("main").getDouble("temp");
+                final double humidity = jsonResponse.getJSONObject("main").getDouble("humidity");
+                final double windSpeed = jsonResponse.getJSONObject("wind").getDouble("speed");
+                weather = new Weather(condition, temperature, humidity, windSpeed);
+            }
+            return weather;
+        }
+        catch (IllegalArgumentException exception) {
+            System.err.println("Error fetching weather data for city: " + city + ". " + exception.getMessage());
+            return null;
+        }
+
     }
 
     /**
