@@ -1,30 +1,43 @@
 package frontend.view.panels;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+/**
+ * ChatbotPanel is a JPanel that contains a conversation area, input field, and send button.
+ * 
+ * @null This class does not accept null values.
+ */
 public class ChatbotPanel extends JPanel {
-    private final JTextArea conversationArea; // Text area to display conversation
-    private final JTextField inputField;      // Text field for user input
-    private final JButton sendButton;         // Button to send message
+    private static final int CONVERSATION_AREA_ROWS = 20;
+    private static final int CONVERSATION_AREA_COLUMNS = 40;
+
+    private static final int INPUT_FIELD_COLUMNS = 40;
+
+    private final JTextArea conversationArea;
+    private final JTextField inputField;
+    private final JButton sendButton;
 
     public ChatbotPanel() {
-        setLayout(new BorderLayout());
-
+        conversationArea = new JTextArea(CONVERSATION_AREA_ROWS, CONVERSATION_AREA_COLUMNS);
+        conversationArea.setEditable(false);
         // Initialize the conversation area
-        conversationArea = new JTextArea(20, 40);
-        conversationArea.setEditable(false);  // Make conversation area read-only
+        conversationArea.setEditable(false);
         conversationArea.setLineWrap(true);
         conversationArea.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(conversationArea);
-
-        // Initialize the input field for user messages
-        inputField = new JTextField(40);
+        final JScrollPane scrollPane = new JScrollPane(conversationArea);
+        inputField = new JTextField(INPUT_FIELD_COLUMNS);
 
         // Initialize the send button
         sendButton = new JButton("Send");
 
         // Add components to the panel
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+        final JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.add(inputField, BorderLayout.CENTER);
         bottomPanel.add(sendButton, BorderLayout.EAST);
 
