@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
+import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -14,16 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Manages session-based conversation history and integrates with OpenAI API.
  */
 public class ChatbotService {
-    private static final String API_URL = "https://api.openai.com/v1/chat/completions"; // Placeholder
+    private static final String API_URL = "https://api.openai.com/v1/chat/completions";
     private static final String API_KEY = loadApiKey();
 
-    private static String loadApiKey() {
-        Dotenv dotenv = Dotenv.configure()
-                            .directory("./") // Ensure it points to the correct path
-                            .load();
-        return dotenv.get("OPENAI_API_KEY");
-    }
-
+    // HTTP status code for OK
+    private static final int HTTP_STATUS_OK = 200;
 
     // Map to store session IDs and their corresponding conversation history
     private final Map<String, List<String>> sessionHistories;
@@ -32,13 +28,20 @@ public class ChatbotService {
         this.sessionHistories = new HashMap<>();
     }
 
+    private static String loadApiKey() {
+        final Dotenv dotenv = Dotenv.configure()
+                            .directory("./")
+                            .load();
+        return dotenv.get("OPENAI_API_KEY");
+    }
+
     /**
      * Starts a new chatbot session and returns a unique session ID.
      *
      * @return A unique session ID.
      */
     public String startSession() {
-        String sessionId = UUID.randomUUID().toString();
+        final String sessionId = UUID.randomUUID().toString();
         sessionHistories.put(sessionId, new ArrayList<>());
         return sessionId;
     }
@@ -49,6 +52,7 @@ public class ChatbotService {
      * @param sessionId   The unique session ID.
      * @param userMessage The message input by the user.
      * @return The chatbot's response.
+     * @throws IllegalArgumentException if the session ID is invalid.
      */
     public String getChatbotResponse(String sessionId, String userMessage) {
         // Ensure the session exists
@@ -60,7 +64,7 @@ public class ChatbotService {
         sessionHistories.get(sessionId).add("User: " + userMessage);
 
         // Prepare the request payload
-        String requestBody = """
+        final String requestBody = """
                 {
                     "model": "gpt-4-mini",
                     "messages": [
@@ -70,6 +74,7 @@ public class ChatbotService {
                 }
                 """.formatted(userMessage);
 
+        String chatbotResponse;
         try {
             // Send API request
             HttpRequest request = HttpRequest.newBuilder()
@@ -79,20 +84,27 @@ public class ChatbotService {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-
-            // Parse and return response
-            if (response.statusCode() == 200) {
-                String chatbotResponse = extractResponse(response.body());
-                sessionHistories.get(sessionId).add("AI: " + chatbotResponse);
-                return chatbotResponse;
-            } else {
+            final HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == HTTP_STATUS_OK) {
+                chatbotResponse = extractResponse(response.body());
+                // Parse and return response
+                if (response.statusCode() == 200) {
+                    chatbotResponse = extractResponse(response.body());
+                    sessionHistories.get(sessionId).add("AI: " + chatbotResponse);
+                } else {
+                    throw new RuntimeException("API call failed: " + response.body());
+                }
+            } 
+            else {
                 throw new RuntimeException("API call failed: " + response.body());
             }
-        } catch (Exception e) {
-            sessionHistories.get(sessionId).add("AI: Error occurred while processing your request.");
-            return "An error occurred. Please try again later.";
         }
+        catch (Exception e) {
+            sessionHistories.get(sessionId).add("AI: Error occurred while processing your request.");
+            chatbotResponse = "An error occurred. Please try again later.";
+        }
+        return chatbotResponse;
     }
 
     /**
@@ -114,13 +126,15 @@ public class ChatbotService {
     private String extractResponse(String responseBody) {
         // Use a JSON library like Jackson or Gson to parse the response
         // Assuming the response contains a field "choices" which is a list, and inside that "text"
+        String chatbotResponse;
         try {
-            JsonNode rootNode = new ObjectMapper().readTree(responseBody);
-            String chatbotResponse = rootNode.path("choices").get(0).path("message").path("content").asText();
-            return chatbotResponse;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error parsing response.";
+            final JsonNode rootNode = new ObjectMapper().readTree(responseBody);
+            chatbotResponse = rootNode.path("choices").get(0).path("message").path("content").asText();
+        } 
+        catch (IOException ioException) {
+            ioException.printStackTrace();
+            chatbotResponse = "Error parsing response.";
         }
+        return chatbotResponse;
     }
 }
