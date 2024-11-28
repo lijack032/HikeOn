@@ -2,6 +2,17 @@ package backend.service;
 
 import frontend.model.Weather;
 import frontend.utils.ApiUtils;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Service class responsible for fetching and managing weather data.
@@ -9,55 +20,82 @@ import frontend.utils.ApiUtils;
  * robust error handling for API interactions.
  */
 public class WeatherService {
-    private Weather currentWeather;
+    private static final String API_KEY = "7c49878c18fe506669243c238670b9ff\n";  // Replace with your actual API key
+    private static final String FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
-    /**
-     * Constructs a WeatherService instance with no initial weather data.
-     * The weather data must be explicitly updated using updateWeather().
-     */
-    public WeatherService() {
-        this.currentWeather = null;
-    }
+    private final OkHttpClient client = new OkHttpClient();
 
-    /**
-     * Fetches the latest weather data from the API and updates the internal state.
-     * In case of errors or an invalid response, a default fallback Weather object
-     * is created to ensure continuity.
-     * Error Handling:
-     * - Logs errors to the console in case of exceptions during the API call.
-     * - Uses a default Weather object when the API returns null or fails.
-     * @param city is the location that the user wants to check the weather of.
-     */
+    // Method to get a 3-day weather forecast
+    public String getWeather(String location) throws IOException {
+        String url = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
+        Request request = new Request.Builder().url(url).build();
 
-            }
-            else {
-                currentWeather = fetchedWeather;
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                JSONObject jsonResponse = new JSONObject(response.body().string());
+                return parseThreeDayForecast(jsonResponse);
+            } else {
+                throw new IOException("Unexpected code " + response);
             }
         }
-        catch (IllegalStateException exception) {
-            handleFallbackWeather("Unexpected state: " + exception.getMessage());
+    }
+
+    // Method to parse and generate a 3-day weather forecast summary
+    private String parseThreeDayForecast(JSONObject jsonResponse) {
+        JSONArray forecastList = jsonResponse.getJSONArray("list");
+
+        Map<String, DayForecast> dailyForecast = new HashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (int i = 0; i < forecastList.length(); i++) {
+            JSONObject forecast = forecastList.getJSONObject(i);
+            String date = forecast.getString("dt_txt").split(" ")[0];
+
+            double temp = forecast.getJSONObject("main").getDouble("temp");
+            String condition = forecast.getJSONArray("weather").getJSONObject(0).getString("main");
+
+            dailyForecast.putIfAbsent(date, new DayForecast());
+            dailyForecast.get(date).addEntry(temp, condition);
         }
+
+        StringBuilder forecastSummary = new StringBuilder("3-Day Forecast:\n");
+        LocalDate today = LocalDate.now();
+        for (int day = 1; day <= 3; day++) {
+            String dateKey = today.plusDays(day).format(formatter);
+            DayForecast dayForecast = dailyForecast.get(dateKey);
+
+            if (dayForecast != null) {
+                forecastSummary.append(dateKey).append(": ")
+                        .append(dayForecast.getAverageTemp()).append("°C, ")
+                        .append(dayForecast.getMostFrequentCondition()).append("\n");
+            } else {
+                forecastSummary.append(dateKey).append(": No data available\n");
+            }
+        }
+        return forecastSummary.toString();
     }
 
-    /**
-     * Returns the current weather data. Automatically updates the data if it is outdated
-     * or unavailable. If the update fails, a default fallback Weather object is returned.
-     *
-     * @return the current Weather object, guaranteed to be non-null.
-     * @param city is the location that the user wants to check the weather of.
-     */
-    public Weather getCurrentWeather(String city) {
-        updateWeather(city);
-        return currentWeather;
-    }
+    // Helper class for daily forecast data
+    private static class DayForecast {
+        private double tempSum = 0;
+        private int count = 0;
+        private Map<String, Integer> conditionFrequency = new HashMap<>();
 
-    /**
-     * Handles fallback behavior by creating a default Weather object and logging a message.
-     *
-     * @param message the reason for falling back to the default weather data.
-     */
-    private void handleFallbackWeather(String message) {
-        System.err.println("Fallback triggered: " + message);
+        void addEntry(double temp, String condition) {
+            tempSum += temp;
+            count++;
+            conditionFrequency.put(condition, conditionFrequency.getOrDefault(condition, 0) + 1);
+        }
+
+        double getAverageTemp() {
+            return count > 0 ? Math.round((tempSum / count) * 10.0) / 10.0 : 0.0;
+        }
+
+        String getMostFrequentCondition() {
+            return conditionFrequency.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse("N/A");
+        }
     }
 }
-
