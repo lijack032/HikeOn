@@ -2,7 +2,8 @@ package frontend.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * HTTP client utility class.
@@ -15,7 +16,6 @@ public class HttpClient {
      * Timeout value for the connection and read operations in milliseconds.
      */
     private static final int TIMEOUT = 5000;
-
 
     /**
      * Sends a GET request to the specified URL and returns the response as a string.

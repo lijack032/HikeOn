@@ -7,7 +7,7 @@ import backend.service.WeatherService;
 import frontend.view.panels.HomePanel;
 
 /**
- * MainFrame class for the HikeOn application.
+ * MainFrame class for the HikeOn application. This class is the main entry point for the application
  */
 public class MainFrame extends JFrame {
 
@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
 
         // Fetch weather data for a dynamic city
-        String city = "Toronto";
+        final String city = "Toronto";
         weatherService.updateWeather(city);
     }
 
