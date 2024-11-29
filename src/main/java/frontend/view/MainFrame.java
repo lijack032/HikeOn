@@ -128,7 +128,7 @@ public class MainFrame {
     private static void addButtons(JPanel panel, GridBagConstraints gbc) {
         addWeatherButton(panel, gbc);
         addGoogleMapsButton(panel, gbc);
-        addHikeOnAIButton(panel, gbc);
+        addHikeOnAiButton(panel, gbc);
     }
 
     private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
@@ -161,7 +161,7 @@ public class MainFrame {
         panel.add(googleMapsButton, gbc);
     }
 
-    private static void addHikeOnAIButton(JPanel panel, GridBagConstraints gbc) {
+    private static void addHikeOnAiButton(JPanel panel, GridBagConstraints gbc) {
         final JButton hikeOnAiButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
                 new Color(255, 200, 0));
 

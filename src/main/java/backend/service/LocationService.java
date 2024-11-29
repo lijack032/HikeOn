@@ -56,7 +56,7 @@ public class LocationService {
     public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation) {
         final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
                 + "query=hiking+trail+" + "&location=" + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
-                + "&radius=10000" + "&rankby=prominence" + "&key=" + GOOGLE_API_KEY;
+                + "&radius=50000" + "&rankby=prominence" + "&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         final String response = HttpClient.sendGetRequest(apiUrl);
