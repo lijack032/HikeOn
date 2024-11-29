@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LocationService {
-    private static final String GOOGLE_PLACES_API_KEY = "AIzaSyB7r1tH4uyQ9nO46e_Lpr8HjHGaiVFgqb4";
-    private static final String GOOGLE_GEOCODING_API_KEY = "AIzaSyB7r1tH4uyQ9nO46e_Lpr8HjHGaiVFgqb4";
+    private static final String GOOGLE_API_KEY = "To be modified later";
 
     /**
      * Get the geographical coordinates (latitude and longitude) for a given location.
@@ -19,7 +18,7 @@ public class LocationService {
      * @throws IllegalArgumentException if the location is not valid
      */
     public GeoLocation getCoordinates(String location) {
-        String apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" + location.replace(" ", "+") + "&key=" + GOOGLE_GEOCODING_API_KEY;
+        String apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" + location.replace(" ", "+") + "&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         String response = HttpClient.sendGetRequest(apiUrl);
@@ -48,7 +47,7 @@ public class LocationService {
     public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation) {
         String apiUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
                 geoLocation.getLatitude() + "," + geoLocation.getLongitude() +
-                "&radius=5000&keyword=hiking+trail&key=" + GOOGLE_PLACES_API_KEY;
+                "&radius=5000&keyword=hiking+trail&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         String response = HttpClient.sendGetRequest(apiUrl);
