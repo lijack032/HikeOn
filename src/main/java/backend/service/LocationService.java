@@ -3,6 +3,7 @@ package backend.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import frontend.utils.LocationNameConverter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,12 +52,14 @@ public class LocationService {
      * Find nearby hiking spots for a given geo-location.
      *
      * @param geoLocation the geographical location (latitude, longitude) to search nearby hiking spots
+     * @param location the actual location to be searched
      * @return a list of HikingSpot objects representing the nearby hiking trails
      */
-    public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation) {
+    public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation, String location) {
         final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
-                + "query=hiking+trail+" + "&location=" + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
-                + "&radius=500000" + "&rankby=prominence" + "&key=" + GOOGLE_API_KEY;
+                + "query=hiking+trail" + location.replace(" ", "+") + "&location="
+                + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
+                + "&radius=60000" + "&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         final String response = HttpClient.sendGetRequest(apiUrl);

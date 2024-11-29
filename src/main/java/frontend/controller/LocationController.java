@@ -43,7 +43,7 @@ public class LocationController {
     public void searchHikingSpots(String location) {
         try {
             final GeoLocation geoLocation = locationService.getCoordinates(location);
-            final List<HikingSpot> spots = locationService.findNearbyHikingSpots(geoLocation);
+            final List<HikingSpot> spots = locationService.findNearbyHikingSpots(geoLocation, location);
 
             // Show results in a new frame
             showHikingSpotResults(spots, location);
