@@ -36,8 +36,9 @@ public class MainFrame {
     private static final int TITLE_COLOR_BLUE = 34;
     private static final int LABEL_FONT_SIZE = 16;
     private static final int LOCATION_FONT_SIZE = 16;
-
     private static final int INSET_SIZE = 10;
+
+    private static final String LOCATIONTEXTFIELD = "locationTextField";
 
     /**
     * The main method to launch the HikeOn application.
@@ -106,7 +107,7 @@ public class MainFrame {
         gbc.gridx = 1;
         panel.add(locationField, gbc);
 
-        panel.putClientProperty("LocationTextField", locationField);
+        panel.putClientProperty(LOCATIONTEXTFIELD, locationField);
     }
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
@@ -147,13 +148,8 @@ public class MainFrame {
         googleMapsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String location = ((JTextField) panel.getClientProperty("LocationTextField")).getText();
-                if (location.isBlank()) {
-                    return;
-                }
-
-                // Trigger the LocationController to search for hiking spots
-                LocationController locationController = new LocationController();
+                final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
+                final LocationController locationController = new LocationController();
                 locationController.searchHikingSpots(location);
             }
         });
