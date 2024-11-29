@@ -1,11 +1,15 @@
 package frontend.view;
 
+import backend.service.WeatherService;
+import frontend.utils.LocationNameConverter;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -98,6 +102,8 @@ public class MainFrame {
         panel.add(locationLabel, gbc);
         gbc.gridx = 1;
         panel.add(locationField, gbc);
+
+        panel.putClientProperty("LocationTextField", locationField);
     }
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
@@ -110,11 +116,25 @@ public class MainFrame {
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         panel.add(weatherLabel, gbc);
+
+        panel.putClientProperty("WeatherLabel", weatherLabel);
     }
 
     private static void addButtons(JPanel panel, GridBagConstraints gbc) {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
+        final JLabel weatherLabel = (JLabel) panel.getClientProperty("WeatherLabel");
+        final JTextField locationField = (JTextField) panel.getClientProperty("LocationTextField");
+        fetchWeatherButton.addActionListener(e -> {
+            final String location = LocationNameConverter.capitalizeLocationName(locationField.getText());
+            try {
+                final String weatherInfo = (new WeatherService()).getWeather(location);
+                weatherLabel.setText("<html>" + weatherInfo.replace("\n", "<br>") + "</html>");
+            }
+            catch (IOException ex) {
+                weatherLabel.setText("Error fetching weather data.");
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -136,6 +156,7 @@ public class MainFrame {
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         panel.add(hikeOnAIButton, gbc);
+
     }
 
     private static JPanel createFooterPanel() {

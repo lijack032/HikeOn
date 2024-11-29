@@ -1,18 +1,17 @@
 package backend.service;
 
-import frontend.model.Weather;
-import frontend.utils.ApiUtils;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Service class responsible for fetching and managing weather data.
@@ -28,48 +27,51 @@ public class WeatherService {
 
     // Method to get a 3-day weather forecast
     public String getWeather(String location) throws IOException {
-        String url = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
-        Request request = new Request.Builder().url(url).build();
+        final String url = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
+        final Request request = new Request.Builder().url(url).build();
 
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
-                JSONObject jsonResponse = new JSONObject(response.body().string());
-                return parseThreeDayForecast(jsonResponse);
-            } else {
+                final JSONObject jsonResponse = new JSONObject(response.body().string());
+                return parseThreeDayForecast(jsonResponse, location);
+            }
+            else {
                 throw new IOException("Unexpected code " + response);
             }
         }
     }
 
     // Method to parse and generate a 3-day weather forecast summary
-    private String parseThreeDayForecast(JSONObject jsonResponse) {
-        JSONArray forecastList = jsonResponse.getJSONArray("list");
+    private String parseThreeDayForecast(JSONObject jsonResponse, String location) throws IOException {
+        final JSONArray forecastList = jsonResponse.getJSONArray("list");
 
-        Map<String, DayForecast> dailyForecast = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final Map<String, DayForecast> dailyForecast = new HashMap<>();
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         for (int i = 0; i < forecastList.length(); i++) {
-            JSONObject forecast = forecastList.getJSONObject(i);
-            String date = forecast.getString("dt_txt").split(" ")[0];
+            final JSONObject forecast = forecastList.getJSONObject(i);
+            final String date = forecast.getString("dt_txt").split(" ")[0];
 
-            double temp = forecast.getJSONObject("main").getDouble("temp");
-            String condition = forecast.getJSONArray("weather").getJSONObject(0).getString("main");
+            final double temp = forecast.getJSONObject("main").getDouble("temp");
+            final String condition = forecast.getJSONArray("weather").getJSONObject(0).getString("main");
 
             dailyForecast.putIfAbsent(date, new DayForecast());
             dailyForecast.get(date).addEntry(temp, condition);
         }
 
-        StringBuilder forecastSummary = new StringBuilder("3-Day Forecast:\n");
-        LocalDate today = LocalDate.now();
+        final String title = "3-Day Forecast for " + location + ":\n";
+        final StringBuilder forecastSummary = new StringBuilder(title);
+        final LocalDate today = LocalDate.now();
         for (int day = 1; day <= 3; day++) {
-            String dateKey = today.plusDays(day).format(formatter);
-            DayForecast dayForecast = dailyForecast.get(dateKey);
+            final String dateKey = today.plusDays(day).format(formatter);
+            final DayForecast dayForecast = dailyForecast.get(dateKey);
 
             if (dayForecast != null) {
                 forecastSummary.append(dateKey).append(": ")
                         .append(dayForecast.getAverageTemp()).append("°C, ")
                         .append(dayForecast.getMostFrequentCondition()).append("\n");
-            } else {
+            }
+            else {
                 forecastSummary.append(dateKey).append(": No data available\n");
             }
         }
@@ -77,10 +79,10 @@ public class WeatherService {
     }
 
     // Helper class for daily forecast data
-    private static class DayForecast {
-        private double tempSum = 0;
-        private int count = 0;
-        private Map<String, Integer> conditionFrequency = new HashMap<>();
+    private static final class DayForecast {
+        private double tempSum;
+        private int count;
+        private final Map<String, Integer> conditionFrequency = new HashMap<>();
 
         void addEntry(double temp, String condition) {
             tempSum += temp;
@@ -89,7 +91,11 @@ public class WeatherService {
         }
 
         double getAverageTemp() {
-            return count > 0 ? Math.round((tempSum / count) * 10.0) / 10.0 : 0.0;
+            double average = 0.0;
+            if (count > 0) {
+                average = Math.round(tempSum / count);
+            }
+            return average;
         }
 
         String getMostFrequentCondition() {
