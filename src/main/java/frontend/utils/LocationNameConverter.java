@@ -22,5 +22,5 @@ public class LocationNameConverter {
             }
         }
         return properSpelling.toString().trim();
-        }
+    }
 }

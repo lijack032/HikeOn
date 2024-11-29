@@ -3,7 +3,6 @@ package backend.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import frontend.utils.LocationNameConverter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -59,7 +58,7 @@ public class LocationService {
         final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
                 + "query=hiking+trail" + location.replace(" ", "+") + "&location="
                 + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
-                + "&radius=60000" + "&key=" + GOOGLE_API_KEY;
+                + "&radius=50000" + "&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         final String response = HttpClient.sendGetRequest(apiUrl);
