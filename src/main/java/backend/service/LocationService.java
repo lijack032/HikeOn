@@ -13,7 +13,7 @@ import frontend.utils.HttpClient;
  * Service for handling giving hiking location recommendation using Google Place Search.
  */
 public class LocationService {
-    private static final String GOOGLE_API_KEY = "To be added later";
+    private static final String GOOGLE_API_KEY = "";
     private static final String GEOMETRY = "geometry";
     private static final String LOCATION = "location";
 
@@ -54,9 +54,9 @@ public class LocationService {
      * @return a list of HikingSpot objects representing the nearby hiking trails
      */
     public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation) {
-        final String apiUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
-                + "&radius=5000&keyword=hiking+trail&key=" + GOOGLE_API_KEY;
+        final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
+                + "query=hiking+trail+" + "&location=" + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
+                + "&radius=10000" + "&rankby=prominence" + "&key=" + GOOGLE_API_KEY;
 
         // Use the HttpClient utility to send a GET request
         final String response = HttpClient.sendGetRequest(apiUrl);
@@ -116,4 +116,3 @@ public class LocationService {
     }
 
 }
-
