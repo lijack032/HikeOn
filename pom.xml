@@ -67,6 +67,12 @@
             <version>2.15.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.3.27</version> <!-- or any stable version -->
+        </dependency>
+
     </dependencies>
 
     <properties>

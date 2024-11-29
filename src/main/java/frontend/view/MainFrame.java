@@ -1,14 +1,13 @@
 package frontend.view;
 
-import backend.service.WeatherService;
-import frontend.utils.LocationNameConverter;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -17,6 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import backend.service.WeatherService;
+import frontend.controller.LocationController;
+import frontend.utils.LocationNameConverter;
 
 /**
  * SecondMainFrame is the main frame for the HikeOn application.
@@ -121,42 +124,54 @@ public class MainFrame {
     }
 
     private static void addButtons(JPanel panel, GridBagConstraints gbc) {
+        addWeatherButton(panel, gbc);
+        addGoogleMapsButton(panel, gbc);
+        addHikeOnAIButton(panel, gbc);
+    }
+
+    private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
-        final JLabel weatherLabel = (JLabel) panel.getClientProperty("WeatherLabel");
-        final JTextField locationField = (JTextField) panel.getClientProperty("LocationTextField");
-        fetchWeatherButton.addActionListener(e -> {
-            final String location = LocationNameConverter.capitalizeLocationName(locationField.getText());
-            try {
-                final String weatherInfo = (new WeatherService()).getWeather(location);
-                weatherLabel.setText("<html>" + weatherInfo.replace("\n", "<br>") + "</html>");
-            }
-            catch (IOException ex) {
-                weatherLabel.setText("Error fetching weather data.");
-            }
-        });
 
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(fetchWeatherButton, gbc);
+    }
 
+    private static void addGoogleMapsButton(JPanel panel, GridBagConstraints gbc) {
         final JButton googleMapsButton = createStyledButton("Find Nearby Hiking Trails", new Color(34, 139, 34),
                 new Color(60, 179, 113));
+
+        // Action listener for the "Find Nearby Hiking Trails" button
+        googleMapsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String location = ((JTextField) panel.getClientProperty("LocationTextField")).getText();
+                if (location.isBlank()) {
+                    return;
+                }
+
+                // Trigger the LocationController to search for hiking spots
+                LocationController locationController = new LocationController();
+                locationController.searchHikingSpots(location);
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         panel.add(googleMapsButton, gbc);
+    }
 
+    private static void addHikeOnAIButton(JPanel panel, GridBagConstraints gbc) {
         final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
                 new Color(255, 200, 0));
-        
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         panel.add(hikeOnAIButton, gbc);
-
     }
 
     private static JPanel createFooterPanel() {
