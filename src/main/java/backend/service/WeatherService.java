@@ -19,13 +19,19 @@ import okhttp3.Response;
  * robust error handling for API interactions.
  */
 public class WeatherService {
-    private static final String API_KEY = "7c49878c18fe506669243c238670b9ff\n";  // Replace with your actual API key
+    private static final String API_KEY = "";
     private static final String FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
-
 
     private final OkHttpClient client = new OkHttpClient();
 
     // Method to get a 3-day weather forecast
+    /**
+     * Retrieves a 3-day weather forecast for the specified location.
+     *
+     * @param location the location for which to get the weather forecast
+     * @return a string containing the 3-day weather forecast summary
+     * @throws IOException if an I/O error occurs when calling the weather API
+     */
     public String getWeather(String location) throws IOException {
         final String url = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
         final Request request = new Request.Builder().url(url).build();
@@ -33,16 +39,15 @@ public class WeatherService {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 final JSONObject jsonResponse = new JSONObject(response.body().string());
-                return parseThreeDayForecast(jsonResponse, location);
-            }
+                return parseThreeDayForecast(jsonResponse);
+            } 
             else {
                 throw new IOException("Unexpected code " + response);
             }
         }
     }
 
-    // Method to parse and generate a 3-day weather forecast summary
-    private String parseThreeDayForecast(JSONObject jsonResponse, String location) throws IOException {
+    private String parseThreeDayForecast(JSONObject jsonResponse) {
         final JSONArray forecastList = jsonResponse.getJSONArray("list");
 
         final Map<String, DayForecast> dailyForecast = new HashMap<>();
@@ -59,18 +64,18 @@ public class WeatherService {
             dailyForecast.get(date).addEntry(temp, condition);
         }
 
-        final String title = "3-Day Forecast for " + location + ":\n";
-        final StringBuilder forecastSummary = new StringBuilder(title);
+        final StringBuilder forecastSummary = new StringBuilder("3-Day Forecast:\n");
         final LocalDate today = LocalDate.now();
-        for (int day = 1; day <= 3; day++) {
+        final int forecastDays = 3;
+        for (int day = 1; day <= forecastDays; day++) {
             final String dateKey = today.plusDays(day).format(formatter);
             final DayForecast dayForecast = dailyForecast.get(dateKey);
 
             if (dayForecast != null) {
                 forecastSummary.append(dateKey).append(": ")
-                        .append(dayForecast.getAverageTemp()).append("°C, ")
+                        .append(dayForecast.getAverageTemp()).append(" degrees C, ")
                         .append(dayForecast.getMostFrequentCondition()).append("\n");
-            }
+            } 
             else {
                 forecastSummary.append(dateKey).append(": No data available\n");
             }
@@ -78,11 +83,14 @@ public class WeatherService {
         return forecastSummary.toString();
     }
 
-    // Helper class for daily forecast data
+    /**
+     * Helper class for daily forecast data.
+     * @null
+     */
     private static final class DayForecast {
         private double tempSum;
         private int count;
-        private final Map<String, Integer> conditionFrequency = new HashMap<>();
+        private Map<String, Integer> conditionFrequency = new HashMap<>();
 
         void addEntry(double temp, String condition) {
             tempSum += temp;
@@ -91,11 +99,12 @@ public class WeatherService {
         }
 
         double getAverageTemp() {
-            double average = 0.0;
+            final double roundingFactor = 10.0;
+            double averageTemp = 0.0;
             if (count > 0) {
-                average = Math.round(tempSum / count);
+                averageTemp = Math.round((tempSum / count) * roundingFactor) / roundingFactor;
             }
-            return average;
+            return averageTemp;
         }
 
         String getMostFrequentCondition() {

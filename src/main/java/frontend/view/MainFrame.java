@@ -22,7 +22,7 @@ import frontend.controller.LocationController;
 import frontend.utils.LocationNameConverter;
 
 /**
- * SecondMainFrame is the main frame for the HikeOn application.
+ * Main frame for the HikeOn application.
  * 
  * @null
  */
@@ -34,8 +34,9 @@ public class MainFrame {
     private static final int TITLE_COLOR_RED = 34;
     private static final int TITLE_COLOR_GREEN = 139;
     private static final int TITLE_COLOR_BLUE = 34;
-    private static final int LABEL_FONT_SIZE = 16;
     private static final int LOCATION_FONT_SIZE = 16;
+    private static final int BUTTON_FONT_SIZE = 14;
+
     private static final int INSET_SIZE = 10;
 
     private static final String LOCATIONTEXTFIELD = "locationTextField";
@@ -161,13 +162,13 @@ public class MainFrame {
     }
 
     private static void addHikeOnAIButton(JPanel panel, GridBagConstraints gbc) {
-        final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
+        final JButton hikeOnAiButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
                 new Color(255, 200, 0));
 
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
-        panel.add(hikeOnAIButton, gbc);
+        panel.add(hikeOnAiButton, gbc);
     }
 
     private static JPanel createFooterPanel() {
@@ -181,8 +182,8 @@ public class MainFrame {
     private static JButton createStyledButton(String text, Color defaultColor, Color hoverColor) {
         final JButton button = new JButton(text);
         button.setBackground(defaultColor);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font(FONT_NAME, Font.BOLD, 14));
+        button.setFont(new Font(FONT_NAME, Font.BOLD, BUTTON_FONT_SIZE));
+        button.setFocusPainted(false);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(defaultColor));
 
