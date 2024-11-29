@@ -46,9 +46,10 @@ public class MainController {
         if (city == null || city.trim().isEmpty()) {
             throw new IllegalArgumentException("City name cannot be null or empty.");
         }
-        final Weather currentWeather = weatherService.getCurrentWeather(city.trim());
+        final String currentWeather = weatherService.getWeather(city.trim());
         if (currentWeather != null) {
-            homePanel.updateWeatherPanel(currentWeather);
+            final Weather weather = new Weather(currentWeather);
+            homePanel.updateWeatherPanel(weather);
         }
     }
 
