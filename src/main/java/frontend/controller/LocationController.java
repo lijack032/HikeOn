@@ -106,10 +106,7 @@ public class LocationController {
                 try {
                     openMapInBrowser(spot);
                 }
-                catch (URISyntaxException ex) {
-                    throw new RuntimeException(ex);
-                }
-                catch (IOException ex) {
+                catch (URISyntaxException | IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }
@@ -138,7 +135,7 @@ public class LocationController {
             userRatingsText = "No ratings available";
         }
 
-        return new JLabel("<html>Rating: " + ratingText + "<br>User Ratings: " + userRatingsText + "</html>");
+        return new JLabel("<html>Rating: " + ratingText + "<br>Total Ratings: " + userRatingsText + "</html>");
 
     }
 
