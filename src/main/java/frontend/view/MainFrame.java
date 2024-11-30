@@ -6,6 +6,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -14,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+<<<<<<< HEAD
 import backend.service.ChatbotService;
 import frontend.controller.ChatbotController;
 import frontend.view.panels.ChatbotPanel;
@@ -21,6 +25,15 @@ import frontend.view.panels.ChatbotPanel;
 /**
  * SecondMainFrame is the main frame for the HikeOn application.
  *
+=======
+import backend.service.WeatherService;
+import frontend.controller.LocationController;
+import frontend.utils.LocationNameConverter;
+
+/**
+ * Main frame for the HikeOn application.
+ * 
+>>>>>>> 9250754be6f2ddaf177c21394717811e7987ce73
  * @null
  */
 public class MainFrame {
@@ -31,10 +44,12 @@ public class MainFrame {
     private static final int TITLE_COLOR_RED = 34;
     private static final int TITLE_COLOR_GREEN = 139;
     private static final int TITLE_COLOR_BLUE = 34;
-    private static final int LABEL_FONT_SIZE = 16;
     private static final int LOCATION_FONT_SIZE = 16;
+    private static final int BUTTON_FONT_SIZE = 14;
 
     private static final int INSET_SIZE = 10;
+
+    private static final String LOCATIONTEXTFIELD = "locationTextField";
 
     /**
     * The main method to launch the HikeOn application.
@@ -102,6 +117,8 @@ public class MainFrame {
         panel.add(locationLabel, gbc);
         gbc.gridx = 1;
         panel.add(locationField, gbc);
+
+        panel.putClientProperty(LOCATIONTEXTFIELD, locationField);
     }
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
@@ -114,9 +131,17 @@ public class MainFrame {
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         panel.add(weatherLabel, gbc);
+
+        panel.putClientProperty("WeatherLabel", weatherLabel);
     }
 
     private static void addButtons(JPanel panel, GridBagConstraints gbc) {
+        addWeatherButton(panel, gbc);
+        addGoogleMapsButton(panel, gbc);
+        addHikeOnAiButton(panel, gbc);
+    }
+
+    private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
 
@@ -124,25 +149,44 @@ public class MainFrame {
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(fetchWeatherButton, gbc);
+    }
 
+    private static void addGoogleMapsButton(JPanel panel, GridBagConstraints gbc) {
         final JButton googleMapsButton = createStyledButton("Find Nearby Hiking Trails", new Color(34, 139, 34),
                 new Color(60, 179, 113));
+
+        // Action listener for the "Find Nearby Hiking Trails" button
+        googleMapsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
+                final LocationController locationController = new LocationController();
+                locationController.searchHikingSpots(location);
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         panel.add(googleMapsButton, gbc);
+    }
 
+<<<<<<< HEAD
         final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
         new Color(255, 200, 0));
 
         // Open the ChatbotPanel in a new window
         hikeOnAIButton.addActionListener(e -> openChatbotWindow());
+=======
+    private static void addHikeOnAiButton(JPanel panel, GridBagConstraints gbc) {
+        final JButton hikeOnAiButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
+                new Color(255, 200, 0));
+>>>>>>> 9250754be6f2ddaf177c21394717811e7987ce73
 
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
-        panel.add(hikeOnAIButton, gbc);
+        panel.add(hikeOnAiButton, gbc);
     }
 
     private static void openChatbotWindow() {
@@ -189,8 +233,8 @@ public class MainFrame {
     private static JButton createStyledButton(String text, Color defaultColor, Color hoverColor) {
         final JButton button = new JButton(text);
         button.setBackground(defaultColor);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font(FONT_NAME, Font.BOLD, 14));
+        button.setFont(new Font(FONT_NAME, Font.BOLD, BUTTON_FONT_SIZE));
+        button.setFocusPainted(false);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(defaultColor));
 

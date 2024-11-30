@@ -1,12 +1,7 @@
 package frontend.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import frontend.model.Location;
 import frontend.model.Weather;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -52,23 +47,4 @@ public class ApiUtils {
         return weather;
     }
 
-    /**
-     * Fetches nearby locations based on the user's search query.
-     * @param query The search query for locations.
-     * @return A list of Location objects based on the search query.
-     */
-    public static List<Location> fetchNearbyLocations(String query) {
-        final String response = HttpClient.sendGetRequest(LOCATION_API_URL + query);
-
-        final List<Location> locations = new ArrayList<>();
-        if (response != null && !response.isEmpty()) {
-            final JSONArray jsonResponse = new JSONArray(response);
-            for (int i = 0; i < jsonResponse.length(); i++) {
-                final JSONObject locationJson = jsonResponse.getJSONObject(i);
-                final String locationName = locationJson.getString("name");
-                locations.add(new Location(locationName));
-            }
-        }
-        return locations;
-    }
 }

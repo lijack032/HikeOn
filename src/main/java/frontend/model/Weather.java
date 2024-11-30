@@ -18,6 +18,13 @@ public class Weather {
         this.windSpeed = windSpeed;
     }
 
+    public Weather(String weatherData) {
+        // Initialize the Weather object using the weatherData string
+        
+        // Example: parse the weatherData string and set the fields accordingly
+
+    }
+
     public String getCondition() {
         return condition;
     }
