@@ -17,23 +17,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-<<<<<<< HEAD
 import backend.service.ChatbotService;
-import frontend.controller.ChatbotController;
-import frontend.view.panels.ChatbotPanel;
-
-/**
- * SecondMainFrame is the main frame for the HikeOn application.
- *
-=======
 import backend.service.WeatherService;
+import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
 import frontend.utils.LocationNameConverter;
+import frontend.view.panels.ChatbotPanel;
 
 /**
  * Main frame for the HikeOn application.
  * 
->>>>>>> 9250754be6f2ddaf177c21394717811e7987ce73
  * @null
  */
 public class MainFrame {
@@ -171,17 +164,17 @@ public class MainFrame {
         panel.add(googleMapsButton, gbc);
     }
 
-<<<<<<< HEAD
-        final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
-        new Color(255, 200, 0));
-
-        // Open the ChatbotPanel in a new window
-        hikeOnAIButton.addActionListener(e -> openChatbotWindow());
-=======
     private static void addHikeOnAiButton(JPanel panel, GridBagConstraints gbc) {
         final JButton hikeOnAiButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
                 new Color(255, 200, 0));
->>>>>>> 9250754be6f2ddaf177c21394717811e7987ce73
+
+        // Action listener for the "HikeOn AI" button
+        hikeOnAiButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openChatbotWindow();
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -190,28 +183,28 @@ public class MainFrame {
     }
 
     private static void openChatbotWindow() {
-        JFrame chatbotFrame = new JFrame("HikeOn AI Chatbot");
+        final JFrame chatbotFrame = new JFrame("HikeOn AI Chatbot");
         chatbotFrame.setSize(600, 400);
         chatbotFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         chatbotFrame.setLayout(new BorderLayout());
 
         // Create instances of ChatbotPanel and ChatbotService
-        ChatbotPanel chatbotPanel = new ChatbotPanel();
-        ChatbotService chatbotService = new ChatbotService();
+        final ChatbotPanel chatbotPanel = new ChatbotPanel();
+        final ChatbotService chatbotService = new ChatbotService();
 
         // Create the ChatbotController
-        ChatbotController chatbotController = new ChatbotController(chatbotPanel, chatbotService);
+        final ChatbotController chatbotController = new ChatbotController(chatbotPanel, chatbotService);
 
         // Start a new chatbot session
-        String sessionId = chatbotService.startSession();
+        final String sessionId = chatbotService.startSession();
         chatbotController.startChatSession(sessionId);
 
         // Add the chatbot panel to the frame
         chatbotFrame.add(chatbotPanel, BorderLayout.CENTER);
 
         // Add functionality to the send button
-        chatbotPanel.addSendButtonListener(e -> {
-            String userInput = chatbotPanel.getUserInput();
+        chatbotPanel.addSendButtonListener(Send -> {
+            final String userInput = chatbotPanel.getUserInput();
             if (!userInput.isEmpty()) {
                 chatbotController.handleUserMessage(userInput);
                 chatbotPanel.clearInputField();
@@ -220,7 +213,6 @@ public class MainFrame {
 
         chatbotFrame.setVisible(true);
     }
-
 
     private static JPanel createFooterPanel() {
         final JPanel footerPanel = new JPanel();
