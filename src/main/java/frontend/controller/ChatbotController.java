@@ -38,7 +38,7 @@ public class ChatbotController {
         currentSession.addMessage("User: " + userMessage);
         
         // Get the response from the chatbot service
-        String chatbotResponse = chatbotService.getChatbotResponse(userMessage, currentSession.getSessionId());
+        String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(), userMessage);
         
         // Add the chatbot's response to the session's conversation history
         currentSession.addMessage("AI: " + chatbotResponse);
