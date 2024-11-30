@@ -14,9 +14,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import backend.service.ChatbotService;
+import frontend.controller.ChatbotController;
+import frontend.view.panels.ChatbotPanel;
+
 /**
  * SecondMainFrame is the main frame for the HikeOn application.
- * 
+ *
  * @null
  */
 public class MainFrame {
@@ -130,13 +134,49 @@ public class MainFrame {
         panel.add(googleMapsButton, gbc);
 
         final JButton hikeOnAIButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
-                new Color(255, 200, 0));
-        
+        new Color(255, 200, 0));
+
+        // Open the ChatbotPanel in a new window
+        hikeOnAIButton.addActionListener(e -> openChatbotWindow());
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         panel.add(hikeOnAIButton, gbc);
     }
+
+    private static void openChatbotWindow() {
+        JFrame chatbotFrame = new JFrame("HikeOn AI Chatbot");
+        chatbotFrame.setSize(600, 400);
+        chatbotFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        chatbotFrame.setLayout(new BorderLayout());
+
+        // Create instances of ChatbotPanel and ChatbotService
+        ChatbotPanel chatbotPanel = new ChatbotPanel();
+        ChatbotService chatbotService = new ChatbotService();
+
+        // Create the ChatbotController
+        ChatbotController chatbotController = new ChatbotController(chatbotPanel, chatbotService);
+
+        // Start a new chatbot session
+        String sessionId = chatbotService.startSession();
+        chatbotController.startChatSession(sessionId);
+
+        // Add the chatbot panel to the frame
+        chatbotFrame.add(chatbotPanel, BorderLayout.CENTER);
+
+        // Add functionality to the send button
+        chatbotPanel.addSendButtonListener(e -> {
+            String userInput = chatbotPanel.getUserInput();
+            if (!userInput.isEmpty()) {
+                chatbotController.handleUserMessage(userInput);
+                chatbotPanel.clearInputField();
+            }
+        });
+
+        chatbotFrame.setVisible(true);
+    }
+
 
     private static JPanel createFooterPanel() {
         final JPanel footerPanel = new JPanel();
