@@ -24,7 +24,8 @@ public class ChatbotController {
      * @param sessionId unique identifier for the session
      */
     public void startChatSession(String sessionId) {
-        currentSession = new ChatbotSession(sessionId); // Initialize a new session
+        // initialize a new session
+        currentSession = new ChatbotSession(sessionId);
     }
 
     /**
@@ -38,13 +39,13 @@ public class ChatbotController {
         currentSession.addMessage("User: " + userMessage);
         
         // Get the response from the chatbot service
-        String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(), userMessage);
+        final String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(), userMessage);
         
         // Add the chatbot's response to the session's conversation history
         currentSession.addMessage("AI: " + chatbotResponse);
         
         // Display the updated conversation on the ChatbotPanel
-        String conversationText = String.join("\n", currentSession.getConversationHistory());
+        final String conversationText = String.join("\n", currentSession.getConversationHistory());
         chatbotPanel.displayConversation(conversationText);
     }
 
