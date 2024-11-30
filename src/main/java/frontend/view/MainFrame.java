@@ -6,6 +6,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -13,6 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import backend.service.WeatherService;
+import frontend.controller.LocationController;
+import frontend.utils.LocationNameConverter;
 
 /**
  * Main frame for the HikeOn application.
@@ -31,6 +38,8 @@ public class MainFrame {
     private static final int BUTTON_FONT_SIZE = 14;
 
     private static final int INSET_SIZE = 10;
+
+    private static final String LOCATIONTEXTFIELD = "locationTextField";
 
     /**
     * The main method to launch the HikeOn application.
@@ -98,6 +107,8 @@ public class MainFrame {
         panel.add(locationLabel, gbc);
         gbc.gridx = 1;
         panel.add(locationField, gbc);
+
+        panel.putClientProperty(LOCATIONTEXTFIELD, locationField);
     }
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
@@ -110,9 +121,17 @@ public class MainFrame {
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         panel.add(weatherLabel, gbc);
+
+        panel.putClientProperty("WeatherLabel", weatherLabel);
     }
 
     private static void addButtons(JPanel panel, GridBagConstraints gbc) {
+        addWeatherButton(panel, gbc);
+        addGoogleMapsButton(panel, gbc);
+        addHikeOnAiButton(panel, gbc);
+    }
+
+    private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
 
@@ -120,18 +139,32 @@ public class MainFrame {
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(fetchWeatherButton, gbc);
+    }
 
+    private static void addGoogleMapsButton(JPanel panel, GridBagConstraints gbc) {
         final JButton googleMapsButton = createStyledButton("Find Nearby Hiking Trails", new Color(34, 139, 34),
                 new Color(60, 179, 113));
+
+        // Action listener for the "Find Nearby Hiking Trails" button
+        googleMapsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
+                final LocationController locationController = new LocationController();
+                locationController.searchHikingSpots(location);
+            }
+        });
 
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         panel.add(googleMapsButton, gbc);
+    }
 
+    private static void addHikeOnAiButton(JPanel panel, GridBagConstraints gbc) {
         final JButton hikeOnAiButton = createStyledButton("HikeOn AI", new Color(255, 165, 0),
                 new Color(255, 200, 0));
-        
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;

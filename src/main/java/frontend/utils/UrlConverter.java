@@ -5,6 +5,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+/**
+ * This class is designed to convert a formatted string to an url.
+ */
 public class UrlConverter {
 
     /**
@@ -14,18 +17,17 @@ public class UrlConverter {
      * @return A valid URL object, or null if the input string cannot be converted.
      */
     public static URL convertToUrl(String urlString) {
+        URL result = null;
         try {
             // Replace spaces and ensure proper encoding
             final URI uri = new URI(urlString.replace(" ", "%20"));
 
             // Convert the URI to a URL
-            return uri.toURL();
+            result = uri.toURL();
         }
         catch (URISyntaxException | MalformedURLException exception) {
             System.err.println("Invalid URL syntax: " + urlString + " - " + exception.getMessage());
-            return null;
         }
+        return result;
     }
-
 }
-
