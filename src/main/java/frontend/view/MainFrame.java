@@ -21,12 +21,12 @@ import backend.service.ChatbotService;
 import backend.service.WeatherService;
 import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
-import frontend.utils.LocationNameConverter;
+import frontend.view.panels.AutocompleteTextField;
 import frontend.view.panels.ChatbotPanel;
 
 /**
  * Main frame for the HikeOn application.
- * 
+ *
  * @null
  */
 public class MainFrame {
@@ -45,10 +45,10 @@ public class MainFrame {
     private static final String LOCATIONTEXTFIELD = "locationTextField";
 
     /**
-    * The main method to launch the HikeOn application.
-    *
-    * @param args the command line arguments
-    */
+     * The main method to launch the HikeOn application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         final JFrame frame = createMainFrame();
         frame.add(createTitlePanel(), BorderLayout.NORTH);
@@ -103,7 +103,10 @@ public class MainFrame {
     private static void addLocationComponents(JPanel panel, GridBagConstraints gbc) {
         final JLabel locationLabel = new JLabel("Location:");
         locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LOCATION_FONT_SIZE));
-        final JTextField locationField = new JTextField(15);
+
+        final LocationController locationController = new LocationController();
+        final AutocompleteTextField locationField = new AutocompleteTextField(locationController);
+        locationField.setColumns(15);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
