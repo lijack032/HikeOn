@@ -141,6 +141,51 @@ public class LocationController {
 
     }
 
+    /**
+     * Handle user input with suggestions and allow confirmation.
+     *
+     * @param input the user's location input
+     */
+    public void handleLocationWithSuggestions(String input) {
+        // Fetch location suggestions from the service
+        final List<String> suggestions = locationService.suggestLocations(input);
+
+        if (!suggestions.isEmpty()) {
+            // Normalize user input for case-insensitive comparison
+            final String normalizedInput = input.trim().toLowerCase();
+
+            // Check if the input matches any suggestion
+            final boolean isExactMatch = suggestions.stream()
+                    .map(String::toLowerCase)
+                    .anyMatch(suggestion -> suggestion.equals(normalizedInput));
+
+            if (isExactMatch) {
+                // Input matches a valid city name; proceed without prompting
+                searchHikingSpots(input);
+            }
+            else {
+                // Input does not match; show "Did you mean..." prompt
+                final String topSuggestion = suggestions.get(0);
+                final int response = JOptionPane.showConfirmDialog(null,
+                        "Do you mean: " + topSuggestion + "?", "Location Suggestion",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (response == JOptionPane.YES_OPTION) {
+                    // User accepts the suggestion
+                    searchHikingSpots(topSuggestion);
+                }
+                else {
+                    // User declines the suggestion
+                    JOptionPane.showMessageDialog(null, "Please refine your input and try again.");
+                }
+            }
+        }
+        else {
+            // No suggestions found for the input
+            JOptionPane.showMessageDialog(null, "No suggestions found for: " + input);
+        }
+    }
+
     // Helper method to calculate the weighted rating of a hiking spot
     private double getWeightedRating(HikingSpot spot) {
         final Double rating = spot.getRating();

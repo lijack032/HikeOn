@@ -109,6 +109,32 @@ public class LocationService {
     }
 
     /**
+     * Suggest possible locations based on user input.
+     *
+     * @param input the partial user input
+     * @return a list of suggested location names
+     */
+    public List<String> suggestLocations(String input) {
+        final String apiUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input="
+                + input.replace(" ", "+") + "&key=" + GOOGLE_API_KEY;
+
+        // Use HttpClient utility to send a GET request
+        final String response = HttpClient.sendGetRequest(apiUrl);
+
+        // Parse response JSON
+        final JSONObject responseJson = new JSONObject(response);
+        final JSONArray predictions = responseJson.getJSONArray("predictions");
+
+        final List<String> suggestions = new ArrayList<>();
+        for (int i = 0; i < predictions.length(); i++) {
+            final String description = predictions.getJSONObject(i).getString("description");
+            suggestions.add(description);
+        }
+
+        return suggestions;
+    }
+
+    /**
      * A class that records the coordinates of the location that is entered by the users.
      * Its information is used for searching possible location for hiking.
      */

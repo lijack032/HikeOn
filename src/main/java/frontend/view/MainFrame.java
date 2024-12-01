@@ -154,7 +154,7 @@ public class MainFrame {
             public void actionPerformed(ActionEvent e) {
                 final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
                 final LocationController locationController = new LocationController();
-                locationController.searchHikingSpots(location);
+                locationController.handleLocationWithSuggestions(location);
             }
         });
 
