@@ -3,12 +3,12 @@ package backend.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import frontend.model.HikingSpot;
 import frontend.utils.HttpClient;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Service for handling giving hiking location recommendation using Google Place Search.
@@ -103,7 +103,7 @@ public class LocationService {
                 .load();
         final String apiKey = dotenv.get("Google_API_KEY");
         if (apiKey == null || apiKey.isEmpty()) {
-            throw new IllegalStateException("API Key not found in OpenAI.env file");
+            throw new IllegalStateException("API Key not found in Google_key.env file");
         }
         return apiKey;
     }
