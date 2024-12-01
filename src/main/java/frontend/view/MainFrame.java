@@ -18,15 +18,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import backend.service.ChatbotService;
+import backend.service.LocationService;
 import backend.service.WeatherService;
 import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
-import frontend.utils.LocationNameConverter;
+import frontend.view.panels.AutocompleteTextField;
 import frontend.view.panels.ChatbotPanel;
 
 /**
  * Main frame for the HikeOn application.
- * 
+ *
  * @null
  */
 public class MainFrame {
@@ -103,7 +104,10 @@ public class MainFrame {
     private static void addLocationComponents(JPanel panel, GridBagConstraints gbc) {
         final JLabel locationLabel = new JLabel("Location:");
         locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LOCATION_FONT_SIZE));
-        final JTextField locationField = new JTextField(15);
+
+        final LocationService locationService = new LocationService();
+        final AutocompleteTextField locationField = new AutocompleteTextField(locationService);
+        locationField.setColumns(15);
 
         gbc.gridx = 0;
         gbc.gridy = 0;

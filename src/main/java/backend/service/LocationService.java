@@ -96,6 +96,34 @@ public class LocationService {
         return hikingSpots;
     }
 
+    /**
+     * Get autocomplete suggestions for a location input using Google Places API.
+     *
+     * @param input the user's input
+     * @return a list of suggested location names
+     */
+    public List<String> getAutocompleteSuggestions(String input) {
+        final String apiUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input="
+                + input.replace(" ", "+") + "&types=(cities)&key=" + GOOGLE_API_KEY;
+
+        // Use HttpClient utility to send a GET request
+        final String response = HttpClient.sendGetRequest(apiUrl);
+
+        // Parse the response JSON
+        final JSONObject responseJson = new JSONObject(response);
+        final JSONArray predictions = responseJson.optJSONArray("predictions");
+
+        final List<String> suggestions = new ArrayList<>();
+        if (predictions != null) {
+            for (int i = 0; i < predictions.length(); i++) {
+                final String description = predictions.getJSONObject(i).getString("description");
+                suggestions.add(description);
+            }
+        }
+
+        return suggestions;
+    }
+
     private static String loadGoogleApiKey() {
         final Dotenv dotenv = Dotenv.configure()
                 .filename("Google_key.env")
