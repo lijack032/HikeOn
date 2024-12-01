@@ -13,17 +13,25 @@ import javax.swing.*;
 import backend.service.LocationService;
 
 /**
- * A class responsible for the autocomplete of the user's input of location.
+ * A text field with autocomplete functionality for location input.
  */
 public class AutocompleteTextField extends JTextField {
+    private static final int DEBOUNCE_DELAY_MS = 300;
+
     private final JPopupMenu suggestionsPopup;
     private final LocationService locationService;
     private final Map<String, List<String>> suggestionCache;
     private final ScheduledExecutorService debounceExecutor;
     private ScheduledFuture<?> debounceFuture;
+
     private String latestInput = "";
     private boolean isMouseHovering;
 
+    /**
+     * Constructor for the AutocompleteTextField.
+     *
+     * @param locationService the service used for fetching location suggestions
+     */
     public AutocompleteTextField(LocationService locationService) {
         this.locationService = locationService;
         this.suggestionsPopup = new JPopupMenu();
@@ -31,6 +39,11 @@ public class AutocompleteTextField extends JTextField {
         this.suggestionCache = new HashMap<>();
         this.debounceExecutor = Executors.newSingleThreadScheduledExecutor();
 
+        initializeKeyListener();
+        initializePopupListener();
+    }
+
+    private void initializeKeyListener() {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -46,11 +59,13 @@ public class AutocompleteTextField extends JTextField {
                 }
             }
         });
+    }
 
+    private void initializePopupListener() {
         suggestionsPopup.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
-
+                // Do nothing
             }
 
             @Override
@@ -72,18 +87,16 @@ public class AutocompleteTextField extends JTextField {
 
         latestInput = input;
 
-        // Schedule the fetch task with a delay
         debounceFuture = debounceExecutor.schedule(() -> {
             SwingUtilities.invokeLater(() -> fetchSuggestions(input));
-        }, 300, TimeUnit.MILLISECONDS);
+        }, DEBOUNCE_DELAY_MS, TimeUnit.MILLISECONDS);
     }
 
     private void fetchSuggestions(String input) {
         if (input.equals(latestInput)) {
-            // Check the cache first
             List<String> suggestions = suggestionCache.get(input.toLowerCase());
+
             if (suggestions == null) {
-                // Fetch from the API if not cached
                 suggestions = locationService.getAutocompleteSuggestions(input);
                 suggestionCache.put(input.toLowerCase(), suggestions);
             }
@@ -116,6 +129,7 @@ public class AutocompleteTextField extends JTextField {
     private JMenuItem createSuggestionItem(String suggestion) {
         final JMenuItem item = new JMenuItem(suggestion);
         item.setFocusable(false);
+
         item.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -127,6 +141,7 @@ public class AutocompleteTextField extends JTextField {
                 isMouseHovering = false;
             }
         });
+
         item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -134,7 +149,14 @@ public class AutocompleteTextField extends JTextField {
                 suggestionsPopup.setVisible(false);
             }
         });
+
         return item;
     }
 
+    /**
+     * Shuts down the executor service to free up resources.
+     */
+    public void cleanUp() {
+        debounceExecutor.shutdown();
+    }
 }

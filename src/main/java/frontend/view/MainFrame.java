@@ -22,6 +22,7 @@ import backend.service.LocationService;
 import backend.service.WeatherService;
 import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
+import frontend.utils.LocationNameConverter;
 import frontend.view.panels.AutocompleteTextField;
 import frontend.view.panels.ChatbotPanel;
 
@@ -46,10 +47,10 @@ public class MainFrame {
     private static final String LOCATIONTEXTFIELD = "locationTextField";
 
     /**
-    * The main method to launch the HikeOn application.
-    *
-    * @param args the command line arguments
-    */
+     * The main method to launch the HikeOn application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         final JFrame frame = createMainFrame();
         frame.add(createTitlePanel(), BorderLayout.NORTH);
@@ -158,7 +159,7 @@ public class MainFrame {
             public void actionPerformed(ActionEvent e) {
                 final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
                 final LocationController locationController = new LocationController();
-                locationController.handleLocationWithSuggestions(location);
+                locationController.searchHikingSpots(location);
             }
         });
 
