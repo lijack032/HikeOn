@@ -4,23 +4,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 
 import javax.swing.*;
 
-import backend.service.LocationService;
+import frontend.controller.LocationController;
 
 /**
- * A text field with autocomplete functionality for location input.
+ * A text field with autocomplete functionality for location input using LocationController.
  */
 public class AutocompleteTextField extends JTextField {
     private static final int DEBOUNCE_DELAY_MS = 300;
 
     private final JPopupMenu suggestionsPopup;
-    private final LocationService locationService;
-    private final Map<String, List<String>> suggestionCache;
+    private final LocationController locationController;
     private final ScheduledExecutorService debounceExecutor;
     private ScheduledFuture<?> debounceFuture;
 
@@ -30,13 +28,12 @@ public class AutocompleteTextField extends JTextField {
     /**
      * Constructor for the AutocompleteTextField.
      *
-     * @param locationService the service used for fetching location suggestions
+     * @param locationController the controller used for fetching location suggestions
      */
-    public AutocompleteTextField(LocationService locationService) {
-        this.locationService = locationService;
+    public AutocompleteTextField(LocationController locationController) {
+        this.locationController = locationController;
         this.suggestionsPopup = new JPopupMenu();
         this.suggestionsPopup.setFocusable(false);
-        this.suggestionCache = new HashMap<>();
         this.debounceExecutor = Executors.newSingleThreadScheduledExecutor();
 
         initializeKeyListener();
@@ -94,12 +91,7 @@ public class AutocompleteTextField extends JTextField {
 
     private void fetchSuggestions(String input) {
         if (input.equals(latestInput)) {
-            List<String> suggestions = suggestionCache.get(input.toLowerCase());
-
-            if (suggestions == null) {
-                suggestions = locationService.getAutocompleteSuggestions(input);
-                suggestionCache.put(input.toLowerCase(), suggestions);
-            }
+            final List<String> suggestions = locationController.getSuggestions(input);
 
             if (!suggestions.isEmpty()) {
                 updateSuggestions(suggestions);
@@ -151,12 +143,5 @@ public class AutocompleteTextField extends JTextField {
         });
 
         return item;
-    }
-
-    /**
-     * Shuts down the executor service to free up resources.
-     */
-    public void cleanUp() {
-        debounceExecutor.shutdown();
     }
 }

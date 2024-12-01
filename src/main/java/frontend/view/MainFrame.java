@@ -18,11 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import backend.service.ChatbotService;
-import backend.service.LocationService;
 import backend.service.WeatherService;
 import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
-import frontend.utils.LocationNameConverter;
 import frontend.view.panels.AutocompleteTextField;
 import frontend.view.panels.ChatbotPanel;
 
@@ -106,8 +104,8 @@ public class MainFrame {
         final JLabel locationLabel = new JLabel("Location:");
         locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LOCATION_FONT_SIZE));
 
-        final LocationService locationService = new LocationService();
-        final AutocompleteTextField locationField = new AutocompleteTextField(locationService);
+        final LocationController locationController = new LocationController();
+        final AutocompleteTextField locationField = new AutocompleteTextField(locationController);
         locationField.setColumns(15);
 
         gbc.gridx = 0;

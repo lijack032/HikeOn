@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.*;
@@ -99,6 +100,23 @@ public class LocationController {
         resultsFrame.setVisible(true);
     }
 
+    /**
+     * Fetches location suggestions based on the given input.
+     *
+     * @param input the user's location input
+     * @return a list of suggested location names
+     */
+    public List<String> getSuggestions(String input) {
+        final List<String> value;
+        if (input == null || input.trim().isEmpty()) {
+            value = Collections.emptyList();
+        }
+        else {
+            value = locationService.suggestLocations(input.trim());
+        }
+        return value;
+    }
+
     @NotNull
     private JButton getSpotButton(HikingSpot spot) {
         final JButton spotButton = new JButton(spot.getName());
@@ -139,51 +157,6 @@ public class LocationController {
 
         return new JLabel("<html>Rating: " + ratingText + "<br>Total Ratings: " + userRatingsText + "</html>");
 
-    }
-
-    /**
-     * Handle user input with suggestions and allow confirmation.
-     *
-     * @param input the user's location input
-     */
-    public void handleLocationWithSuggestions(String input) {
-        // Fetch location suggestions from the service
-        final List<String> suggestions = locationService.suggestLocations(input);
-
-        if (!suggestions.isEmpty()) {
-            // Normalize user input for case-insensitive comparison
-            final String normalizedInput = input.trim().toLowerCase();
-
-            // Check if the input matches any suggestion
-            final boolean isExactMatch = suggestions.stream()
-                    .map(String::toLowerCase)
-                    .anyMatch(suggestion -> suggestion.equals(normalizedInput));
-
-            if (isExactMatch) {
-                // Input matches a valid city name; proceed without prompting
-                searchHikingSpots(input);
-            }
-            else {
-                // Input does not match; show "Did you mean..." prompt
-                final String topSuggestion = suggestions.get(0);
-                final int response = JOptionPane.showConfirmDialog(null,
-                        "Do you mean: " + topSuggestion + "?", "Location Suggestion",
-                        JOptionPane.YES_NO_OPTION);
-
-                if (response == JOptionPane.YES_OPTION) {
-                    // User accepts the suggestion
-                    searchHikingSpots(topSuggestion);
-                }
-                else {
-                    // User declines the suggestion
-                    JOptionPane.showMessageDialog(null, "Please refine your input and try again.");
-                }
-            }
-        }
-        else {
-            // No suggestions found for the input
-            JOptionPane.showMessageDialog(null, "No suggestions found for: " + input);
-        }
     }
 
     // Helper method to calculate the weighted rating of a hiking spot
