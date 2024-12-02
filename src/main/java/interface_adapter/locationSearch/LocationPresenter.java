@@ -13,14 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 import entity.HikingSpot;
 import use_case.locationSearch.LocationOutputBoundary;
@@ -54,8 +53,8 @@ public class LocationPresenter implements LocationOutputBoundary {
             resultPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
             // Populate the result panel with hiking spots
-            for (HikingSpot spot : hikingSpots) {
-                resultPanel.add(createSpotPanel(spot));
+            for (int i = hikingSpots.size() - 1; i >= 0; i--) {
+                resultPanel.add(createSpotPanel(hikingSpots.get(i)));
             }
 
             final JScrollPane scrollPane = new JScrollPane(resultPanel);
@@ -72,13 +71,15 @@ public class LocationPresenter implements LocationOutputBoundary {
      */
     private JPanel createSpotPanel(HikingSpot spot) {
         final JPanel spotPanel = new JPanel();
-        spotPanel.setLayout(new BoxLayout(spotPanel, BoxLayout.Y_AXIS));
+        spotPanel.setLayout(new GridLayout(4, 1));
         spotPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         spotPanel.setBackground(Color.WHITE);
 
-        final String nameText = spot.getName();
-        final JLabel nameLabel = new JLabel(nameText);
+        // Name Label (Bold, Centered)
+        final JLabel nameLabel = new JLabel("<html><b>" + spot.getName() + "</b></html>", SwingConstants.CENTER);
+        nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        // Rating Label
         final String ratingText;
         if (spot.getRating() != null) {
             ratingText = "Rating: " + spot.getRating();
@@ -86,9 +87,10 @@ public class LocationPresenter implements LocationOutputBoundary {
         else {
             ratingText = "Rating: No rating";
         }
-        final JLabel ratingLabel = new JLabel(ratingText);
-        ratingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        final JLabel ratingLabel = new JLabel(ratingText, SwingConstants.CENTER);
+        ratingLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        // Total Ratings Label
         final String totalRatingsText;
         if (spot.getUserRatingsTotal() != null) {
             totalRatingsText = "Total Ratings: " + spot.getUserRatingsTotal();
@@ -96,10 +98,10 @@ public class LocationPresenter implements LocationOutputBoundary {
         else {
             totalRatingsText = "Total Ratings: No ratings";
         }
-        final JLabel totalRatingsLabel = new JLabel(totalRatingsText);
+        final JLabel totalRatingsLabel = new JLabel(totalRatingsText, SwingConstants.CENTER);
+        totalRatingsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        totalRatingsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
+        // View on Map Button
         final JButton mapButton = new JButton("View on Map");
         mapButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mapButton.addActionListener(new ActionListener() {
@@ -109,10 +111,10 @@ public class LocationPresenter implements LocationOutputBoundary {
             }
         });
 
+        // Add components to the panel
         spotPanel.add(nameLabel);
         spotPanel.add(ratingLabel);
         spotPanel.add(totalRatingsLabel);
-        spotPanel.add(Box.createVerticalStrut(5));
         spotPanel.add(mapButton);
 
         return spotPanel;
