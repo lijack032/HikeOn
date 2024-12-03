@@ -53,20 +53,20 @@ public class WeatherService {
      * @return a list of Weather objects representing the forecast
      */
     public List<Weather> getWeatherWithForecast(String location) {
-        List<Weather> forecastList = new ArrayList<>();
+        final List<Weather> forecastList = new ArrayList<>();
         try {
-            String requestUrl = String.format(FORECAST_API_URL, location, API_KEY);
-            JSONObject forecastData = fetchWeatherData(requestUrl);
-            JSONArray forecastArray = forecastData.getJSONArray("list");
+            final String requestUrl = String.format(FORECAST_API_URL, location, API_KEY);
+            final JSONObject forecastData = fetchWeatherData(requestUrl);
+            final JSONArray forecastArray = forecastData.getJSONArray("list");
 
             // Process the next 8 forecast intervals (e.g., next 24 hours if 3-hour intervals)
             for (int i = 0; i < 8; i++) {
-                JSONObject forecastEntry = forecastArray.getJSONObject(i);
-                long timestamp = forecastEntry.getLong("dt");
-                String formattedTime = convertUnixToTimestamp(timestamp);
+                final JSONObject forecastEntry = forecastArray.getJSONObject(i);
+                final long timestamp = forecastEntry.getLong("dt");
+                final String formattedTime = convertUnixToTimestamp(timestamp);
 
-                String condition = forecastEntry.getJSONArray("weather").getJSONObject(0).getString("description");
-                double temperature = forecastEntry.getJSONObject("main").getDouble("temp");
+                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0).getString("description");
+                final double temperature = forecastEntry.getJSONObject("main").getDouble("temp");
 
                 forecastList.add(new Weather(formattedTime, condition, temperature));
             }
@@ -84,8 +84,8 @@ public class WeatherService {
      * @return the formatted timestamp string (e.g., "2024-12-03 18:00:00")
      */
     private String convertUnixToTimestamp(long unixTimestamp) {
-        Date date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final Date date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
     }
 
@@ -109,8 +109,8 @@ public class WeatherService {
      * @throws IOException if the request fails
      */
     private JSONObject fetchWeatherData(String requestUrl) throws IOException {
-        URI uri = URI.create(requestUrl);
-        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        final URI uri = URI.create(requestUrl);
+        final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
 
@@ -119,7 +119,7 @@ public class WeatherService {
         }
 
         try (Scanner scanner = new Scanner(connection.getInputStream())) {
-            StringBuilder response = new StringBuilder();
+            final StringBuilder response = new StringBuilder();
             while (scanner.hasNext()) {
                 response.append(scanner.nextLine());
             }

@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.io.IOException;
 
 import backend.service.WeatherService;
 import entity.Weather;
@@ -59,7 +60,7 @@ public class WeatherController {
         // Format forecast
         formattedWeather.append("Forecast for the next 24 hours:\n");
         for (Weather weather : forecast) {
-            String time = formatTime(weather.getTimestamp());
+            final String time = formatTime(weather.getTimestamp());
             formattedWeather.append("- ").append(time).append(": ")
                     .append(weather.getCondition()).append(", ")
                     .append(weather.getTemperature()).append(" °C\n");
@@ -80,7 +81,8 @@ public class WeatherController {
             final SimpleDateFormat outputFormat = new SimpleDateFormat("h:mm a");
             final Date date = inputFormat.parse(rawTime);
             formattedTime = outputFormat.format(date);
-        } catch (ParseException parseException) {
+        } 
+        catch (ParseException parseException) {
             parseException.printStackTrace();
             // Return raw time if formatting fails
             formattedTime = rawTime;
