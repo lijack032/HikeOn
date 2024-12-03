@@ -93,7 +93,7 @@ public class MainController {
         final ChatbotPanel chatbotPanel = homePanel.getChatbotPanel();
 
         // Add a listener to handle send button clicks
-        chatbotPanel.addSendButtonListener(e -> {
+        chatbotPanel.addSendButtonListener(event -> {
             final String userInput = chatbotPanel.getUserInput();
             handleChatbotRequest(userInput);
         });
