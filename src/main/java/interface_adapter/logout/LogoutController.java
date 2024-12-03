@@ -1,4 +1,4 @@
-package interface_adapter.autentication.logout;
+package interface_adapter.logout;
 
 import use_case.logout.LogoutInputBoundary;
 

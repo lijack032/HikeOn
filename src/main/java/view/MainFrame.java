@@ -7,11 +7,10 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import backend.service.ChatbotService;
-import entity.InMemoryUserStore;
 import frontend.controller.ChatbotController;
 import frontend.view.panels.ChatbotPanel;
-import interface_adapter.autentication.login.LoginController;
-import interface_adapter.autentication.logout.LogoutController;
+import interface_adapter.login.LoginController;
+import interface_adapter.logout.LogoutController;
 import interface_adapter.locationSearch.LocationController;
 import interface_adapter.locationSearch.LocationPresenter;
 import interface_adapter.register.RegisterController;
@@ -187,11 +186,11 @@ public class MainFrame {
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                logoutController.logout(); // Perform logout
-                frame.dispose(); // Close the MainFrame
+                logoutController.logout();
+                frame.dispose();
                 new LoginPage(new LoginController(new LoginInteractor()),
                         new RegisterController(new RegisterInteractor()))
-                        .setVisible(true); // Relaunch the LoginPage
+                        .setVisible(true);
             }
         });
 

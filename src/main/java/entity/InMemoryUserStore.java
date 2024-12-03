@@ -23,9 +23,6 @@ public class InMemoryUserStore implements UserStore {
 
     @Override
     public boolean addUser(User user) {
-        if (userMap.containsKey(user.getUsername())) {
-            return false; // Username already exists
-        }
         userMap.put(user.getUsername(), user);
         return true;
     }
