@@ -42,3 +42,6 @@ bin/
 
 # ignore .env files
 *.env
+
+# ignore WatherService.java
+src/main/java/backend/service/WeatherService.java
