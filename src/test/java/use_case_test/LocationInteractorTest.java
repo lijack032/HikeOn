@@ -96,8 +96,10 @@ public class LocationInteractorTest {
         // Assert results
         assertNotNull(outputData);
         List<HikingSpot> spots = outputData.getHikingSpots();
+        assertEquals("New York City", outputData.getInputname());
         assertNotNull(spots);
         assertFalse(spots.isEmpty());
+
         for (HikingSpot spot : spots) {
             assertNotNull(spot);
             assertNotNull(spot.getName());
@@ -118,6 +120,7 @@ public class LocationInteractorTest {
         // Assert results
         assertEquals("Invalid location!", exception.getMessage());
     }
+
 
     @Test
     public void testSuggestLocations_NoResults() throws Exception {
