@@ -36,7 +36,7 @@ Use Case Setup:
 
 1) OpenWeather API: Vaibhav Gupta
 
-2) OpenAI API: Arshiya M
+2) OpenAI API: Arshiya Mahmoodinezad
 
 3) Google Maps API: Jack Li
 
