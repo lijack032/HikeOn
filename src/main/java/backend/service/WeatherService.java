@@ -3,13 +3,16 @@ package backend.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import entity.Weather;
 import io.github.cdimascio.dotenv.Dotenv;
 
 /**
@@ -19,75 +22,79 @@ public class WeatherService {
     private static final String API_KEY = loadWeatherApiKey();
     private static final String WEATHER_API_URL = 
         "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
+    private static final String FORECAST_API_URL = 
+        "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s";
 
     /**
      * Fetches the current weather data for a given location.
      * 
      * @param location the location to fetch weather for
-     * @return a string describing the current weather
+     * @return a Weather object representing the current weather
      */
-    public String getWeather(String location) {
-        String result;
+    public Weather getWeather(String location) {
         try {
-            final String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
-            final JSONObject weatherData = fetchWeatherData(requestUrl);
+            String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
+            JSONObject weatherData = fetchWeatherData(requestUrl);
 
             // Parse and return current weather
-            final String description = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
-            final double temperature = weatherData.getJSONObject("main").getDouble("temp");
-            result = String.format("Weather: %s, Temperature: %.2f degrees Celsius", description, temperature);
+            String condition = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
+            double temperature = weatherData.getJSONObject("main").getDouble("temp");
+            return new Weather(condition, temperature);
         } 
-        catch (IOException ioException) {
-            result = "Error fetching current weather: " + ioException.getMessage();
+        catch (IOException e) {
+            throw new RuntimeException("Error fetching current weather: " + e.getMessage(), e);
         }
-        return result;
     }
 
     /**
-     * Fetches the weather and forecast data for a given location.
+     * Fetches the weather forecast data for a given location.
      * 
-     * @param location the location to fetch weather and forecast for
-     * @return a string describing the current weather and forecast
+     * @param location the location to fetch forecast for
+     * @return a list of Weather objects representing the forecast
      */
-    public List<String> getWeatherWithForecast(String location) {
-        final List<String> forecastList = new ArrayList<>();
+    public List<Weather> getWeatherWithForecast(String location) {
+        List<Weather> forecastList = new ArrayList<>();
         try {
-            // Current weather (you can skip this part if already handled elsewhere)
-            final String forecastUrl = String.format(
-                "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s", 
-                location, API_KEY
-            );
-            
-            // Fetch forecast data
-            final JSONObject forecastData = fetchWeatherData(forecastUrl);
-            final JSONArray forecastArray = forecastData.getJSONArray("list");
+            String requestUrl = String.format(FORECAST_API_URL, location, API_KEY);
+            JSONObject forecastData = fetchWeatherData(requestUrl);
+            JSONArray forecastArray = forecastData.getJSONArray("list");
 
-            // Process and store the next 5 forecast intervals
+            // Process the next 8 forecast intervals (e.g., next 24 hours if 3-hour intervals)
             for (int i = 0; i < 8; i++) {
-                final JSONObject forecastEntry = forecastArray.getJSONObject(i);
-                final String timestamp = forecastEntry.getString("dt_txt");
-                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0)
-                    .getString("description");
-                final double temp = forecastEntry.getJSONObject("main").getDouble("temp");
+                JSONObject forecastEntry = forecastArray.getJSONObject(i);
+                long timestamp = forecastEntry.getLong("dt");
+                String formattedTime = convertUnixToTimestamp(timestamp);
 
-                forecastList.add(String.format("%s|%s|%.1f", timestamp, condition, temp));
+                String condition = forecastEntry.getJSONArray("weather").getJSONObject(0).getString("description");
+                double temperature = forecastEntry.getJSONObject("main").getDouble("temp");
+
+                forecastList.add(new Weather(formattedTime, condition, temperature));
             }
         } 
-        catch (IOException ex) {
-            ex.printStackTrace();
-            forecastList.add("Unable to fetch forecast data.");
+        catch (IOException e) {
+            throw new RuntimeException("Error fetching forecast data: " + e.getMessage(), e);
         }
         return forecastList;
     }
 
+    /**
+     * Converts a Unix timestamp to a formatted timestamp string.
+     * 
+     * @param unixTimestamp the Unix timestamp to convert
+     * @return the formatted timestamp string (e.g., "2024-12-03 18:00:00")
+     */
+    private String convertUnixToTimestamp(long unixTimestamp) {
+        Date date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(date);
+    }
+
     private static String loadWeatherApiKey() {
-        final Dotenv dotenv = Dotenv.configure()
-                // Change the filename if necessary
-                .filename("OpenWeatherKey.env")
-                // Specify the correct directory
-                .directory("/Users/vabku/OneDrive/Desktop/CSC207/HikeOn/HikeOn")
-                .load();
-        final String apiKey = dotenv.get("OPENWEATHER_API_KEY");
+        Dotenv dotenv = Dotenv.configure()
+            .filename("OpenWeatherKey.env")
+            .directory("/Users/vabku/OneDrive/Desktop/CSC207/HikeOn/HikeOn")
+            .load();
+        String apiKey = dotenv.get("OPENWEATHER_API_KEY");
         if (apiKey == null || apiKey.isEmpty()) {
             throw new IllegalStateException("Weather API Key not found in Weather_key.env file");
         }
@@ -98,12 +105,12 @@ public class WeatherService {
      * Helper method to fetch JSON data from the OpenWeather API.
      * 
      * @param requestUrl the API request URL
-     * @return the response as a List
+     * @return the response as a JSONObject
      * @throws IOException if the request fails
      */
     private JSONObject fetchWeatherData(String requestUrl) throws IOException {
-        final URI uri = URI.create(requestUrl);
-        final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        URI uri = URI.create(requestUrl);
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
 
@@ -112,7 +119,7 @@ public class WeatherService {
         }
 
         try (Scanner scanner = new Scanner(connection.getInputStream())) {
-            final StringBuilder response = new StringBuilder();
+            StringBuilder response = new StringBuilder();
             while (scanner.hasNext()) {
                 response.append(scanner.nextLine());
             }
