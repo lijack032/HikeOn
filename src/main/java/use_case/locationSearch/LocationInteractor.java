@@ -48,7 +48,7 @@ public class LocationInteractor implements LocationInputBoundary {
         return suggestions;
     }
 
-    private GeoLocation getCoordinates(String location) {
+    public GeoLocation getCoordinates(String location) {
         final String apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address="
                 + prepareUrl(location) + GOOGLE_API_KEY;
         final String response = HttpClient.sendGetRequest(apiUrl);
@@ -65,7 +65,7 @@ public class LocationInteractor implements LocationInputBoundary {
         }
     }
 
-    private List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation, String location) {
+    public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation, String location) {
         final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
                 + "query=hiking+trails" + location.replace(" ", "+") + "&location="
                 + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
@@ -88,16 +88,16 @@ public class LocationInteractor implements LocationInputBoundary {
         return hikingSpots;
     }
 
+    /**
+     * Retrieve the api key for google.
+     * @return the api key.
+     */
     private static String loadGoogleApiKey() {
         final Dotenv dotenv = Dotenv.configure()
                 .filename("Google_key.env")
                 .directory("/Users/jackli/Downloads/HikeOn")
                 .load();
-        final String apiKey = dotenv.get("Google_API_KEY");
-        if (apiKey == null || apiKey.isEmpty()) {
-            throw new IllegalStateException("API Key not found in Google_key.env file");
-        }
-        return apiKey;
+        return dotenv.get("Google_API_KEY");
     }
 
     private static String prepareUrl(String input) {
