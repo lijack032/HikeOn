@@ -64,7 +64,7 @@ public class WeatherController {
 
                 formattedWeather.append("- ").append(time).append(": ")
                                 .append(condition).append(", ")
-                                .append(temperature).append(" degrees C\n");
+                                .append(temperature).append(" °C\n");
             }
         }
 

@@ -19,8 +19,6 @@ public class WeatherService {
     private static final String API_KEY = loadWeatherApiKey();
     private static final String WEATHER_API_URL = 
         "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
-    private static final String FORECAST_API_URL = 
-        "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s";
 
     /**
      * Fetches the current weather data for a given location.
@@ -100,7 +98,7 @@ public class WeatherService {
      * Helper method to fetch JSON data from the OpenWeather API.
      * 
      * @param requestUrl the API request URL
-     * @return the response as a JSONObject
+     * @return the response as a List
      * @throws IOException if the request fails
      */
     private JSONObject fetchWeatherData(String requestUrl) throws IOException {
