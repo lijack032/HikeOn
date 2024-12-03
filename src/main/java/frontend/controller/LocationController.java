@@ -96,7 +96,6 @@ public class LocationController {
                 resultPanel.add(spotPanel);
             }
         }
-
         resultsFrame.setVisible(true);
     }
 
