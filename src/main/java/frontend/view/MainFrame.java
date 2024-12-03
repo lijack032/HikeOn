@@ -59,8 +59,6 @@ public class MainFrame {
         frame.add(createCenterPanel(), BorderLayout.CENTER);
         frame.add(createFooterPanel(), BorderLayout.SOUTH);
         frame.setVisible(true);
-        WeatherService service = new WeatherService();
-        System.out.println(service.getWeather("Toronto"));
     }
 
     private static JFrame createMainFrame() {
@@ -143,7 +141,7 @@ public class MainFrame {
         weatherDisplay.setForeground(new Color(50, 50, 50));
 
         // Scroll pane to handle overflow
-        JScrollPane scrollPane = new JScrollPane(weatherDisplay);
+        final JScrollPane scrollPane = new JScrollPane(weatherDisplay);
         scrollPane.setPreferredSize(new java.awt.Dimension(400, 200));
         weatherPanel.add(scrollPane);
 
@@ -165,6 +163,9 @@ public class MainFrame {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
     
+        // Create an instance of the WeatherController
+        final WeatherController weatherController = new WeatherController();
+    
         // Action listener for the "Get Weather" button
         fetchWeatherButton.addActionListener(new ActionListener() {
             @Override
@@ -177,11 +178,9 @@ public class MainFrame {
                     return;
                 }
     
-                // Use WeatherService to fetch weather and forecast
-                final WeatherService weatherService = new WeatherService();
-    
+                // Fetch the weather using the WeatherController
                 new Thread(() -> {
-                    final String weatherData = weatherService.getWeatherWithForecast(location);
+                    final String weatherData = weatherController.getFormattedWeather(location);
                     SwingUtilities.invokeLater(() -> weatherDisplay.setText(weatherData));
                 }).start();
             }

@@ -2,113 +2,123 @@ package backend.service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Service for fetching weather data.
  */
 public class WeatherService {
-    private static final String API_KEY = "ab2557a806139364c7c42ed9b554d1f4";
-    private static final String API_URL = "http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric";
+    private static final String API_KEY = loadWeatherApiKey();
+    private static final String WEATHER_API_URL = 
+        "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
+    private static final String FORECAST_API_URL = 
+        "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s";
 
     /**
-     * Fetches the weather data for a given location.
-     * @param location the location to fetch the weather for
-     * @return a string describing the weather and temperature
+     * Fetches the current weather data for a given location.
+     * 
+     * @param location the location to fetch weather for
+     * @return a string describing the current weather
      */
     public String getWeather(String location) {
-        String result = "";
+        String result;
         try {
-            final String requestUrl = String.format(API_URL, location, API_KEY);
-            final URI uri = new URI(requestUrl);
-            final URL url = uri.toURL();
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
+            final String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
+            final JSONObject weatherData = fetchWeatherData(requestUrl);
 
-            if (connection.getResponseCode() != 200) {
-                throw new IOException("Failed to fetch weather data. Response code: " + connection.getResponseCode());
-            }
-
-            final StringBuilder response = new StringBuilder();
-            try (Scanner scanner = new Scanner(connection.getInputStream())) {
-                while (scanner.hasNext()) {
-                    response.append(scanner.nextLine());
-                }
-            }
-
-            final JSONObject weatherData = new JSONObject(response.toString());
+            // Parse and return current weather
             final String description = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
             final double temperature = weatherData.getJSONObject("main").getDouble("temp");
-            result = String.format("Weather: %s, Temperature: %.2f°C", description, temperature);
+            result = String.format("Weather: %s, Temperature: %.2f degrees Celsius", description, temperature);
         } 
-        catch (IOException | URISyntaxException e) {
-            System.err.println("Exception: " + e.getMessage());
-            result = "Unable to fetch weather data";
+        catch (IOException ioException) {
+            result = "Error fetching current weather: " + ioException.getMessage();
         }
         return result;
     }
 
     /**
-     * Fetches the current weather and forecast for a given location.
-     * @param location the location to fetch the weather and forecast for
+     * Fetches the weather and forecast data for a given location.
+     * 
+     * @param location the location to fetch weather and forecast for
      * @return a string describing the current weather and forecast
      */
-    public String getWeatherWithForecast(String location) {
-        StringBuilder result = new StringBuilder();
+    public List<String> getWeatherWithForecast(String location) {
+        final List<String> forecastList = new ArrayList<>();
         try {
-            final String currentWeatherUrl = String.format(
-                "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s", location, API_KEY);
+            // Current weather (you can skip this part if already handled elsewhere)
             final String forecastUrl = String.format(
-                "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s", location, API_KEY);
-    
-            // Fetch current weather
-            JSONObject currentWeatherData = fetchWeatherData(currentWeatherUrl);
-            String description = currentWeatherData.getJSONArray("weather").getJSONObject(0).getString("description");
-            double temperature = currentWeatherData.getJSONObject("main").getDouble("temp");
-            result.append(String.format("Current Weather: %s\nTemperature: %.1f°C\n", description, temperature));
-    
-            // Fetch forecast
-            JSONObject forecastData = fetchWeatherData(forecastUrl);
-            result.append("\nForecast:\n");
-            for (int i = 0; i < 5; i++) { // Next 5 intervals (typically every 3 hours)
-                JSONObject forecastEntry = forecastData.getJSONArray("list").getJSONObject(i);
-                final String time = forecastEntry.getString("dt_txt");
-                final String forecastDescription = forecastEntry.getJSONArray("weather")
-                        .getJSONObject(0).getString("description");
-                double forecastTemp = forecastEntry.getJSONObject("main").getDouble("temp");
-                result.append(String.format("%s - %s, %.1f°C\n", time, forecastDescription, forecastTemp));
+                "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s", 
+                location, API_KEY
+            );
+            
+            // Fetch forecast data
+            final JSONObject forecastData = fetchWeatherData(forecastUrl);
+            final JSONArray forecastArray = forecastData.getJSONArray("list");
+
+            // Process and store the next 5 forecast intervals
+            for (int i = 0; i < 8; i++) {
+                final JSONObject forecastEntry = forecastArray.getJSONObject(i);
+                final String timestamp = forecastEntry.getString("dt_txt");
+                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0)
+                    .getString("description");
+                final double temp = forecastEntry.getJSONObject("main").getDouble("temp");
+
+                forecastList.add(String.format("%s|%s|%.1f", timestamp, condition, temp));
             }
         } 
-        catch (Exception e) {
-            e.printStackTrace();
-            result.append("Unable to fetch weather data or forecast.");
+        catch (IOException ex) {
+            ex.printStackTrace();
+            forecastList.add("Unable to fetch forecast data.");
         }
-        return result.toString();
+        return forecastList;
     }
-    
+
+    private static String loadWeatherApiKey() {
+        final Dotenv dotenv = Dotenv.configure()
+                // Change the filename if necessary
+                .filename("OpenWeatherKey.env")
+                // Specify the correct directory
+                .directory("/Users/vabku/OneDrive/Desktop/CSC207/HikeOn/HikeOn")
+                .load();
+        final String apiKey = dotenv.get("OPENWEATHER_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("Weather API Key not found in Weather_key.env file");
+        }
+        return apiKey;
+    }
+
+    /**
+     * Helper method to fetch JSON data from the OpenWeather API.
+     * 
+     * @param requestUrl the API request URL
+     * @return the response as a JSONObject
+     * @throws IOException if the request fails
+     */
     private JSONObject fetchWeatherData(String requestUrl) throws IOException {
-        URI uri = URI.create(requestUrl);
-        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        final URI uri = URI.create(requestUrl);
+        final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
-    
+
         if (connection.getResponseCode() != 200) {
-            throw new IOException("Failed to fetch weather data: " + connection.getResponseCode());
+            throw new IOException("Failed to fetch data: HTTP " + connection.getResponseCode());
         }
-    
-        Scanner scanner = new Scanner(connection.getInputStream());
-        StringBuilder response = new StringBuilder();
-        while (scanner.hasNext()) {
-            response.append(scanner.nextLine());
+
+        try (Scanner scanner = new Scanner(connection.getInputStream())) {
+            final StringBuilder response = new StringBuilder();
+            while (scanner.hasNext()) {
+                response.append(scanner.nextLine());
+            }
+            return new JSONObject(response.toString());
         }
-        scanner.close();
-    
-        return new JSONObject(response.toString());
     }
 }
