@@ -16,15 +16,17 @@ public class ChatbotController {
     public ChatbotController(ChatbotPanel chatbotPanel, ChatbotService chatbotService) {
         this.chatbotPanel = chatbotPanel;
         this.chatbotService = chatbotService;
+
+        // Add listener for the send button in the panel
+        this.chatbotPanel.addSendButtonListener(e -> handleSendButtonClick());
     }
 
     /**
      * Starts a new chatbot session or retrieves an existing one based on the session ID.
-     * 
+     *
      * @param sessionId unique identifier for the session
      */
     public void startChatSession(String sessionId) {
-        // initialize a new session
         currentSession = new ChatbotSession(sessionId);
     }
 
@@ -35,18 +37,34 @@ public class ChatbotController {
      * @param userMessage the message sent by the user
      */
     public void handleUserMessage(String userMessage) {
+        if (userMessage == null || userMessage.trim().isEmpty()) {
+            return;
+        }
+
         // Add the user message to the session's conversation history
         currentSession.addMessage("User: " + userMessage);
-        
-        // Get the response from the chatbot service
-        final String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(), userMessage);
-        
-        // Add the chatbot's response to the session's conversation history
-        currentSession.addMessage("AI: " + chatbotResponse);
-        
-        // Display the updated conversation on the ChatbotPanel
-        final String conversationText = String.join("\n", currentSession.getConversationHistory());
-        chatbotPanel.displayConversation(conversationText);
+        chatbotPanel.addMessage(userMessage, true);
+
+        // Get the response from the chatbot service asynchronously (to avoid blocking the UI)
+        new Thread(() -> {
+            final String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(),
+                    userMessage);
+
+            // Add the chatbot's response to the session's conversation history
+            currentSession.addMessage("AI: " + chatbotResponse);
+            chatbotPanel.addMessage(chatbotResponse, false);
+        }).start();
+
+        // Clear the input field after sending the message
+        chatbotPanel.clearInputField();
+    }
+
+    /**
+     * Handles the send button click event.
+     */
+    private void handleSendButtonClick() {
+        final String userMessage = chatbotPanel.getUserInput();
+        handleUserMessage(userMessage);
     }
 
     /**
@@ -54,6 +72,8 @@ public class ChatbotController {
      */
     public void endChatSession() {
         // Optionally, you can clear the session history when the chat ends
-        currentSession.clearHistory();
+        if (currentSession != null) {
+            currentSession.clearHistory();
+        }
     }
 }
