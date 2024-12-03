@@ -10,7 +10,7 @@ import javax.swing.JTextField;
 
 /**
  * ChatbotPanel is a JPanel that contains a conversation area, input field, and send button.
- * 
+ *
  * @null This class does not accept null values.
  */
 public class ChatbotPanel extends JPanel {
@@ -63,7 +63,7 @@ public class ChatbotPanel extends JPanel {
 
     /**
      * Adds a listener to the send button for sending user messages.
-     * 
+     *
      * @param actionListener the listener to handle button click events
      */
     public void addSendButtonListener(java.awt.event.ActionListener actionListener) {

@@ -94,7 +94,7 @@ public class LocationInteractor implements LocationInputBoundary {
      */
     private static String loadGoogleApiKey() {
         final Dotenv dotenv = Dotenv.configure()
-                .filename("Google_key.env")
+                .filename(".env")
                 .directory("/Users/jackli/Downloads/HikeOn")
                 .load();
         return dotenv.get("Google_API_KEY");

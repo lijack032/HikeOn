@@ -1,117 +1,124 @@
 package backend.service;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
- * Service class responsible for fetching and managing weather data.
- * This service provides methods to retrieve the current weather and ensures
- * robust error handling for API interactions.
+ * Service for fetching weather data.
  */
 public class WeatherService {
-    private static final String API_KEY = "";
-    private static final String FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
+    private static final String API_KEY = loadWeatherApiKey();
+    private static final String WEATHER_API_URL =
+            "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
+    private static final String FORECAST_API_URL =
+            "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s";
 
-    private final OkHttpClient client = new OkHttpClient();
-
-    // Method to get a 3-day weather forecast
     /**
-     * Retrieves a 3-day weather forecast for the specified location.
+     * Fetches the current weather data for a given location.
      *
-     * @param location the location for which to get the weather forecast
-     * @return a string containing the 3-day weather forecast summary
-     * @throws IOException if an I/O error occurs when calling the weather API
+     * @param location the location to fetch weather for
+     * @return a string describing the current weather
      */
-    public String getWeather(String location) throws IOException {
-        final String url = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
-        final Request request = new Request.Builder().url(url).build();
+    public String getWeather(String location) {
+        String result;
+        try {
+            final String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
+            final JSONObject weatherData = fetchWeatherData(requestUrl);
 
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                final JSONObject jsonResponse = new JSONObject(response.body().string());
-                return parseThreeDayForecast(jsonResponse);
-            } 
-            else {
-                throw new IOException("Unexpected code " + response);
-            }
+            // Parse and return current weather
+            final String description = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
+            final double temperature = weatherData.getJSONObject("main").getDouble("temp");
+            result = String.format("Weather: %s, Temperature: %.2f degrees Celsius", description, temperature);
         }
-    }
-
-    private String parseThreeDayForecast(JSONObject jsonResponse) {
-        final JSONArray forecastList = jsonResponse.getJSONArray("list");
-
-        final Map<String, DayForecast> dailyForecast = new HashMap<>();
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        for (int i = 0; i < forecastList.length(); i++) {
-            final JSONObject forecast = forecastList.getJSONObject(i);
-            final String date = forecast.getString("dt_txt").split(" ")[0];
-
-            final double temp = forecast.getJSONObject("main").getDouble("temp");
-            final String condition = forecast.getJSONArray("weather").getJSONObject(0).getString("main");
-
-            dailyForecast.putIfAbsent(date, new DayForecast());
-            dailyForecast.get(date).addEntry(temp, condition);
+        catch (IOException ioException) {
+            result = "Error fetching current weather: " + ioException.getMessage();
         }
-
-        final StringBuilder forecastSummary = new StringBuilder("3-Day Forecast:\n");
-        final LocalDate today = LocalDate.now();
-        final int forecastDays = 3;
-        for (int day = 1; day <= forecastDays; day++) {
-            final String dateKey = today.plusDays(day).format(formatter);
-            final DayForecast dayForecast = dailyForecast.get(dateKey);
-
-            if (dayForecast != null) {
-                forecastSummary.append(dateKey).append(": ")
-                        .append(dayForecast.getAverageTemp()).append(" degrees C, ")
-                        .append(dayForecast.getMostFrequentCondition()).append("\n");
-            } 
-            else {
-                forecastSummary.append(dateKey).append(": No data available\n");
-            }
-        }
-        return forecastSummary.toString();
+        return result;
     }
 
     /**
-     * Helper class for daily forecast data.
-     * @null
+     * Fetches the weather and forecast data for a given location.
+     *
+     * @param location the location to fetch weather and forecast for
+     * @return a string describing the current weather and forecast
      */
-    private static final class DayForecast {
-        private double tempSum;
-        private int count;
-        private Map<String, Integer> conditionFrequency = new HashMap<>();
+    public List<String> getWeatherWithForecast(String location) {
+        final List<String> forecastList = new ArrayList<>();
+        try {
+            // Current weather (you can skip this part if already handled elsewhere)
+            final String forecastUrl = String.format(
+                    "https://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&appid=%s",
+                    location, API_KEY
+            );
 
-        void addEntry(double temp, String condition) {
-            tempSum += temp;
-            count++;
-            conditionFrequency.put(condition, conditionFrequency.getOrDefault(condition, 0) + 1);
-        }
+            // Fetch forecast data
+            final JSONObject forecastData = fetchWeatherData(forecastUrl);
+            final JSONArray forecastArray = forecastData.getJSONArray("list");
 
-        double getAverageTemp() {
-            final double roundingFactor = 10.0;
-            double averageTemp = 0.0;
-            if (count > 0) {
-                averageTemp = Math.round((tempSum / count) * roundingFactor) / roundingFactor;
+            // Process and store the next 5 forecast intervals
+            for (int i = 0; i < 8; i++) {
+                final JSONObject forecastEntry = forecastArray.getJSONObject(i);
+                final String timestamp = forecastEntry.getString("dt_txt");
+                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0)
+                        .getString("description");
+                final double temp = forecastEntry.getJSONObject("main").getDouble("temp");
+
+                forecastList.add(String.format("%s|%s|%.1f", timestamp, condition, temp));
             }
-            return averageTemp;
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+            forecastList.add("Unable to fetch forecast data.");
+        }
+        return forecastList;
+    }
+
+    private static String loadWeatherApiKey() {
+        final Dotenv dotenv = Dotenv.configure()
+                // Change the filename if necessary
+                .filename(".env")
+                // Specify the correct directory
+                .directory("/Users/jackli/Downloads/HikeOn")
+                .load();
+        final String apiKey = dotenv.get("OPENWEATHER_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("Weather API Key not found in Weather_key.env file");
+        }
+        return apiKey;
+    }
+
+    /**
+     * Helper method to fetch JSON data from the OpenWeather API.
+     *
+     * @param requestUrl the API request URL
+     * @return the response as a JSONObject
+     * @throws IOException if the request fails
+     */
+    private JSONObject fetchWeatherData(String requestUrl) throws IOException {
+        final URI uri = URI.create(requestUrl);
+        final HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        if (connection.getResponseCode() != 200) {
+            throw new IOException("Failed to fetch data: HTTP " + connection.getResponseCode());
         }
 
-        String getMostFrequentCondition() {
-            return conditionFrequency.entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
-                    .orElse("N/A");
+        try (Scanner scanner = new Scanner(connection.getInputStream())) {
+            final StringBuilder response = new StringBuilder();
+            while (scanner.hasNext()) {
+                response.append(scanner.nextLine());
+            }
+            return new JSONObject(response.toString());
         }
     }
 }
