@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.*;
@@ -93,8 +96,24 @@ public class LocationController {
                 resultPanel.add(spotPanel);
             }
         }
-
         resultsFrame.setVisible(true);
+    }
+
+    /**
+     * Fetches location suggestions based on the given input.
+     *
+     * @param input the user's location input
+     * @return a list of suggested location names
+     */
+    public List<String> getSuggestions(String input) {
+        final List<String> value;
+        if (input == null || input.trim().isEmpty()) {
+            value = Collections.emptyList();
+        }
+        else {
+            value = locationService.suggestLocations(input.trim());
+        }
+        return value;
     }
 
     @NotNull
@@ -151,9 +170,10 @@ public class LocationController {
     }
 
     private void openMapInBrowser(HikingSpot spot) throws URISyntaxException, IOException {
+        final String encodedName = URLEncoder.encode(spot.getName(), StandardCharsets.UTF_8);
         final String mapUrl = String.format("https://www.google.com/maps/search/%s/@%s,%s,12z/data=!3m1"
                         + "!4b1?entry=ttu&g_ep=EgoyMDI0MTEyNC4xIKXMDSoASAFQAw%%3D%%3D",
-                spot.getName().replace(" ", "+"), spot.getLatitude(), spot.getLongitude());
+                encodedName, spot.getLatitude(), spot.getLongitude());
         Desktop.getDesktop().browse(new java.net.URI(mapUrl));
     }
 }

@@ -1,36 +1,27 @@
-package frontend.view;
+package view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import backend.service.ChatbotService;
-import backend.service.WeatherService;
+import entity.InMemoryUserStore;
 import frontend.controller.ChatbotController;
-import frontend.controller.LocationController;
-import frontend.controller.WeatherController;
 import frontend.view.panels.ChatbotPanel;
+import interface_adapter.autentication.login.LoginController;
+import interface_adapter.autentication.logout.LogoutController;
+import interface_adapter.locationSearch.LocationController;
+import interface_adapter.locationSearch.LocationPresenter;
+import interface_adapter.register.RegisterController;
+import use_case.locationSearch.LocationInteractor;
+import use_case.login.LoginInteractor;
+import use_case.logout.LogoutInteractor;
+import use_case.register.RegisterInteractor;
 
 /**
  * Main frame for the HikeOn application.
- *
- * @null
  */
 public class MainFrame {
 
@@ -42,26 +33,29 @@ public class MainFrame {
     private static final int TITLE_COLOR_BLUE = 34;
     private static final int LOCATION_FONT_SIZE = 16;
     private static final int BUTTON_FONT_SIZE = 14;
-
     private static final int INSET_SIZE = 10;
-
     private static final String LOCATIONTEXTFIELD = "locationTextField";
-    private static final int LOCATION_FIELD_COLUMNS = 15;
 
     /**
      * The main method to launch the HikeOn application.
      *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        final JFrame frame = createMainFrame();
+     * */
+    public static void launchMainFrame() {
+        final LocationPresenter presenter = new LocationPresenter();
+        final LocationInteractor interactor = new LocationInteractor(presenter);
+        final LocationController controller = new LocationController(interactor);
+
+        final LogoutInteractor logoutInteractor = new LogoutInteractor();
+        final LogoutController logoutController = new LogoutController(logoutInteractor);
+
+        final JFrame frame = createMainFrame(controller);
         frame.add(createTitlePanel(), BorderLayout.NORTH);
-        frame.add(createCenterPanel(), BorderLayout.CENTER);
+        frame.add(createCenterPanel(controller, logoutController, frame), BorderLayout.CENTER); // Pass frame here
         frame.add(createFooterPanel(), BorderLayout.SOUTH);
         frame.setVisible(true);
     }
 
-    private static JFrame createMainFrame() {
+    private static JFrame createMainFrame(LocationController controller) {
         final JFrame frame = new JFrame("HikeOn Outdoor Event Planner");
         final int frameWidth = 600;
         final int frameHeight = 600;
@@ -80,22 +74,19 @@ public class MainFrame {
         return titlePanel;
     }
 
-    private static JPanel createCenterPanel() {
+    private static JPanel createCenterPanel(LocationController locationController, LogoutController logoutController, JFrame frame) {
         final JPanel centerPanel = new JPanel(new GridBagLayout());
         final int borderSize = 20;
         centerPanel.setBorder(BorderFactory.createEmptyBorder(borderSize, borderSize, borderSize, borderSize));
         final GridBagConstraints gbc = createGridBagConstraints();
 
-        addLocationComponents(centerPanel, gbc);
+        addLocationComponents(centerPanel, gbc, locationController);
         addWeatherComponents(centerPanel, gbc);
-        addButtons(centerPanel, gbc);
+        addButtons(centerPanel, gbc, locationController, logoutController, frame); // Pass frame here
 
         return centerPanel;
     }
 
-    public static int getInsetSize() {
-        return INSET_SIZE;
-    }
 
     private static GridBagConstraints createGridBagConstraints() {
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -104,11 +95,13 @@ public class MainFrame {
         return gbc;
     }
 
-    private static void addLocationComponents(JPanel panel, GridBagConstraints gbc) {
+    private static void addLocationComponents(JPanel panel, GridBagConstraints gbc,
+                                              LocationController locationController) {
         final JLabel locationLabel = new JLabel("Location:");
         locationLabel.setFont(new Font(FONT_NAME, Font.PLAIN, LOCATION_FONT_SIZE));
 
-        final JTextField locationField = new JTextField(LOCATION_FIELD_COLUMNS);
+        final AutocompleteTextField locationField = new AutocompleteTextField(locationController);
+        locationField.setColumns(15);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -120,88 +113,46 @@ public class MainFrame {
     }
 
     private static void addWeatherComponents(JPanel panel, GridBagConstraints gbc) {
-        final JPanel weatherPanel = new JPanel();
-        weatherPanel.setLayout(new BoxLayout(weatherPanel, BoxLayout.Y_AXIS));
-        weatherPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 2));
-        weatherPanel.setBackground(new Color(240, 248, 255));
-
-        // Label for the weather
-        final JLabel weatherLabel = new JLabel("Weather & Forecast:");
-        weatherLabel.setFont(new Font(FONT_NAME, Font.BOLD, 16));
-        weatherLabel.setForeground(new Color(70, 130, 180));
-        weatherPanel.add(weatherLabel);
-
-        // Text area for displaying weather data and forecast
-        final JTextArea weatherDisplay = new JTextArea(10, 30); // Multi-line display
-        weatherDisplay.setEditable(false);
-        weatherDisplay.setLineWrap(true);
-        weatherDisplay.setWrapStyleWord(true);
-        weatherDisplay.setFont(new Font(FONT_NAME, Font.PLAIN, 14));
-        weatherDisplay.setBackground(new Color(255, 255, 255));
-        weatherDisplay.setForeground(new Color(50, 50, 50));
-
-        // Scroll pane to handle overflow
-        final JScrollPane scrollPane = new JScrollPane(weatherDisplay);
-        scrollPane.setPreferredSize(new java.awt.Dimension(400, 200));
-        weatherPanel.add(scrollPane);
+        final JLabel weatherLabel = new JLabel("Weather: ");
+        final int weatherFontSize = 16;
+        weatherLabel.setFont(new Font(FONT_NAME, Font.BOLD, weatherFontSize));
+        weatherLabel.setForeground(Color.BLUE);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        panel.add(weatherPanel, gbc);
+        panel.add(weatherLabel, gbc);
 
-        panel.putClientProperty("WeatherDisplay", weatherDisplay);
-}
+        panel.putClientProperty("WeatherLabel", weatherLabel);
+    }
 
-    private static void addButtons(JPanel panel, GridBagConstraints gbc) {
+    private static void addButtons(JPanel panel, GridBagConstraints gbc, LocationController locationController, LogoutController logoutController, JFrame frame) {
         addWeatherButton(panel, gbc);
-        addGoogleMapsButton(panel, gbc);
+        addGoogleMapsButton(panel, gbc, locationController);
         addHikeOnAiButton(panel, gbc);
+        addLogoutButton(panel, gbc, logoutController, frame); // Pass frame here
     }
 
     private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
         final JButton fetchWeatherButton = createStyledButton("Get Weather", new Color(70, 130, 180),
                 new Color(100, 149, 237));
-    
-        // Create an instance of the WeatherController
-        final WeatherController weatherController = new WeatherController();
-    
-        // Action listener for the "Get Weather" button
-        fetchWeatherButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
-                final JTextArea weatherDisplay = (JTextArea) panel.getClientProperty("WeatherDisplay");
-    
-                if (location.isEmpty()) {
-                    weatherDisplay.setText("Please enter a location.");
-                    return;
-                }
-    
-                // Fetch the weather using the WeatherController
-                new Thread(() -> {
-                    final String weatherData = weatherController.getFormattedWeather(location);
-                    SwingUtilities.invokeLater(() -> weatherDisplay.setText(weatherData));
-                }).start();
-            }
-        });
-    
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         panel.add(fetchWeatherButton, gbc);
     }
 
-    private static void addGoogleMapsButton(JPanel panel, GridBagConstraints gbc) {
-        final JButton googleMapsButton = createStyledButton("Find Nearby Hiking Trails", new Color(34, 139, 34),
-                new Color(60, 179, 113));
-
-        // Action listener for the "Find Nearby Hiking Trails" button
+    private static void addGoogleMapsButton(JPanel panel, GridBagConstraints gbc,
+                                            LocationController locationController) {
+        final JButton googleMapsButton = createStyledButton("Find Nearby Hiking Trails",
+                new Color(34, 139, 34), new Color(60, 179, 113));
         googleMapsButton.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String location = ((JTextField) panel.getClientProperty(LOCATIONTEXTFIELD)).getText();
-                final LocationController locationController = new LocationController();
+                final JTextField locationField = (JTextField) panel.getClientProperty(LOCATIONTEXTFIELD);
+                final String location = locationField.getText();
                 locationController.searchHikingSpots(location);
             }
         });
@@ -230,11 +181,29 @@ public class MainFrame {
         panel.add(hikeOnAiButton, gbc);
     }
 
+    private static void addLogoutButton(JPanel panel, GridBagConstraints gbc, LogoutController logoutController, JFrame frame) {
+        final JButton logoutButton = createStyledButton("Logout", new Color(255, 0, 0),
+                new Color(255, 102, 102));
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logoutController.logout(); // Perform logout
+                frame.dispose(); // Close the MainFrame
+                new LoginPage(new LoginController(new LoginInteractor()),
+                        new RegisterController(new RegisterInteractor()))
+                        .setVisible(true); // Relaunch the LoginPage
+            }
+        });
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        panel.add(logoutButton, gbc);
+    }
+
     private static void openChatbotWindow() {
         final JFrame chatbotFrame = new JFrame("HikeOn AI Chatbot");
-        final int chatbotFrameWidth = 600;
-        final int chatbotFrameHeight = 400;
-        chatbotFrame.setSize(chatbotFrameWidth, chatbotFrameHeight);
+        chatbotFrame.setSize(600, 400);
         chatbotFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         chatbotFrame.setLayout(new BorderLayout());
 
@@ -260,7 +229,6 @@ public class MainFrame {
                 chatbotPanel.clearInputField();
             }
         });
-
         chatbotFrame.setVisible(true);
     }
 

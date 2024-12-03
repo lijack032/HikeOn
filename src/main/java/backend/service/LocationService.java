@@ -8,12 +8,13 @@ import org.json.JSONObject;
 
 import frontend.model.HikingSpot;
 import frontend.utils.HttpClient;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Service for handling giving hiking location recommendation using Google Place Search.
  */
 public class LocationService {
-    private static final String GOOGLE_API_KEY = "";
+    private static final String GOOGLE_API_KEY = loadGoogleApiKey();
     private static final String GEOMETRY = "geometry";
     private static final String LOCATION = "location";
 
@@ -93,6 +94,44 @@ public class LocationService {
         }
 
         return hikingSpots;
+    }
+
+    private static String loadGoogleApiKey() {
+        final Dotenv dotenv = Dotenv.configure()
+                .filename("Google_key.env")
+                .directory("/Users/jackli/Downloads/HikeOn")
+                .load();
+        final String apiKey = dotenv.get("Google_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("API Key not found in Google_key.env file");
+        }
+        return apiKey;
+    }
+
+    /**
+     * Suggest possible locations based on user input.
+     *
+     * @param input the partial user input
+     * @return a list of suggested location names
+     */
+    public List<String> suggestLocations(String input) {
+        final String apiUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input="
+                + input.replace(" ", "+") + "&key=" + GOOGLE_API_KEY;
+
+        // Use HttpClient utility to send a GET request
+        final String response = HttpClient.sendGetRequest(apiUrl);
+
+        // Parse response JSON
+        final JSONObject responseJson = new JSONObject(response);
+        final JSONArray predictions = responseJson.getJSONArray("predictions");
+
+        final List<String> suggestions = new ArrayList<>();
+        for (int i = 0; i < predictions.length(); i++) {
+            final String description = predictions.getJSONObject(i).getString("description");
+            suggestions.add(description);
+        }
+
+        return suggestions;
     }
 
     /**
