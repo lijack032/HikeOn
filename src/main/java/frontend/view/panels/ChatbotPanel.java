@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
-import frontend.utils.RoundedBorder;
+import frontend.utils.MarkDownUtils;
 
 /**
  * ChatbotPanel is a JPanel that contains a conversation area, input field, and send button.
@@ -76,22 +76,15 @@ public class ChatbotPanel extends JPanel {
     public void addMessage(String message, boolean isUser) {
         final JPanel messageBubble = new JPanel();
         messageBubble.setLayout(new BorderLayout());
-        messageBubble.setBorder(new RoundedBorder(10));
-    
-        // Ensure the background is properly set here
-        formatToHtml(message);
-        final JLabel messageLabel = new JLabel("<html><body style='width: 200px; font-size: 14px; line-height: 1.6; padding: 5px;'>" + message + "</body></html>");
-        messageLabel.setFont(new Font(FONT_FAMILY, Font.PLAIN, FONT_SIZE));
-    
-        // Set rounded borders
-        messageLabel.setBorder(new RoundedBorder(20));
+        messageBubble.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Set the background for the message label
+        final String htmlMessage = formatToHtml(message);
+        final JLabel messageLabel = new JLabel(htmlMessage);
+        messageLabel.setFont(new Font(FONT_FAMILY, Font.PLAIN, FONT_SIZE));
         messageLabel.setOpaque(true);
         messageLabel.setBackground(isUser ? USER_BUBBLE_COLOR : AI_BUBBLE_COLOR);
         messageLabel.setForeground(Color.BLACK);
-    
-        // Add the message bubble to the conversation panel
+
         if (isUser) {
             messageBubble.add(messageLabel, BorderLayout.EAST);
         }
@@ -99,17 +92,23 @@ public class ChatbotPanel extends JPanel {
         else {
             messageBubble.add(messageLabel, BorderLayout.WEST);
         }
-    
-        // Add the message bubble to the panel and refresh the UI
+
         conversationPanel.add(messageBubble);
         conversationPanel.add(Box.createVerticalStrut(10));
         conversationPanel.revalidate();
         conversationPanel.repaint();
-    }   
+    }
 
-    // Method to replace custom markers with HTML
+    /**
+     * Converts Markdown to HTML using MarkdownUtils.
+     *
+     * @param message the message in Markdown
+     * @return the formatted HTML string
+     */
     private String formatToHtml(String message) {
-
+        return "<html><body style='width: 200px; font-size: 14px; line-height: 1.6; padding: 5px;'>" +
+                MarkDownUtils.markdownToHtml(message) +
+                "</body></html>";
     }
 
     public String getUserInput() {
@@ -128,7 +127,7 @@ public class ChatbotPanel extends JPanel {
      *
      * @param listener the ActionListener to add
      */
-    public void addSendButtonListener(java.awt.event.ActionListener listener) {
+    public void addSendButtonListener(ActionListener listener) {
         sendButton.addActionListener(listener);
     }
 }
