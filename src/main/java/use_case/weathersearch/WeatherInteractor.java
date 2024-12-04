@@ -1,27 +1,21 @@
-package backend.service;
+package use_case.weathersearch;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Scanner;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import entity.Weather;
-
-import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Service for fetching weather data.
  */
-public class WeatherService {
+public class WeatherInteractor {
     private static final String API_KEY = loadWeatherApiKey();
-
     private static final String WEATHER_API_URL =
             "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
     private static final String FORECAST_API_URL =
@@ -31,9 +25,7 @@ public class WeatherService {
      * Fetches the current weather data for a given location.
      *
      * @param location the location to fetch weather for
-
-     * @return a Weather object representing the current weather
-     * @throws RuntimeException if there is an error fetching current weather data
+     * @return a string describing the current weather
      */
     public String getWeather(String location) {
         String result;
@@ -42,7 +34,6 @@ public class WeatherService {
             final JSONObject weatherData = fetchWeatherData(requestUrl);
 
             // Parse and return current weather
-
             final String description = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
             final double temperature = weatherData.getJSONObject("main").getDouble("temp");
             result = String.format("Weather: %s, Temperature: %.2f degrees Celsius", description, temperature);
@@ -54,14 +45,15 @@ public class WeatherService {
     }
 
     /**
-
-     * Fetches the weather forecast data for a given location.
-     * 
-     * @param location the location to fetch forecast for
-     * @return a list of Weather objects representing the forecast
-     * @throws RuntimeException if there is an error fetching forecast data
+     * Fetches the weather and forecast data for a given location.
+     *
+     * @param location the location to fetch weather and forecast for
+     * @return a string describing the current weather and forecast
      */
     public List<String> getWeatherWithForecast(String location) {
+        if (location == null || location.trim().isEmpty()) {
+            throw new IllegalArgumentException("Location cannot be empty!");
+        }
         final List<String> forecastList = new ArrayList<>();
         try {
             // Current weather (you can skip this part if already handled elsewhere)
@@ -77,14 +69,10 @@ public class WeatherService {
             // Process and store the next 5 forecast intervals
             for (int i = 0; i < 8; i++) {
                 final JSONObject forecastEntry = forecastArray.getJSONObject(i);
-
-                final long timestamp = forecastEntry.getLong("dt");
-                final String formattedTime = convertUnixToTimestamp(timestamp);
-
+                final String timestamp = forecastEntry.getString("dt_txt");
                 final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0)
-                    .getString("description");
-                final double temperature = forecastEntry.getJSONObject("main").getDouble("temp");
-
+                        .getString("description");
+                final double temp = forecastEntry.getJSONObject("main").getDouble("temp");
 
                 forecastList.add(String.format("%s|%s|%.1f", timestamp, condition, temp));
             }
@@ -94,20 +82,6 @@ public class WeatherService {
             forecastList.add("Unable to fetch forecast data.");
         }
         return forecastList;
-    }
-
-
-    /**
-     * Converts a Unix timestamp to a formatted timestamp string.
-     * 
-     * @param unixTimestamp the Unix timestamp to convert
-     * @return the formatted timestamp string (e.g., "2024-12-03 18:00:00")
-     */
-    private String convertUnixToTimestamp(long unixTimestamp) {
-        // Convert seconds to milliseconds
-        final Date date = new Date(unixTimestamp * 1000);
-        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return format.format(date);
     }
 
     private static String loadWeatherApiKey() {
@@ -140,9 +114,6 @@ public class WeatherService {
         if (connection.getResponseCode() != 200) {
             throw new IOException("Failed to fetch data: HTTP " + connection.getResponseCode());
         }
-        return apiKey;
-    }
-
 
         try (Scanner scanner = new Scanner(connection.getInputStream())) {
             final StringBuilder response = new StringBuilder();
