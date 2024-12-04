@@ -11,9 +11,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import backend.service.ChatbotService;
-import frontend.controller.ChatbotController;
-import frontend.view.panels.ChatbotPanel;
+import use_case.chatbot.ChatbotService;
+import interface_adapter.chatbot.ChatbotController;
 import interface_adapter.login.LoginController;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.locationSearch.LocationController;
