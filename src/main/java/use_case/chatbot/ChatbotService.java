@@ -1,4 +1,4 @@
-package backend.service;
+package use_case.chatbot;
 
 import java.io.IOException;
 import java.net.URI;
