@@ -1,15 +1,20 @@
 package view;
 
-import interface_adapter.autentication.login.LoginController;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import interface_adapter.login.LoginController;
 import interface_adapter.register.RegisterController;
 import use_case.login.LoginOutputData;
 import use_case.register.RegisterOutputData;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Login and Registration Page for the HikeOn application.
@@ -27,27 +32,29 @@ public class LoginPage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(4, 2));
 
-        JLabel usernameLabel = new JLabel("Username:");
-        JTextField usernameField = new JTextField();
-        JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
-        JButton loginButton = new JButton("Login");
-        JButton registerButton = new JButton("Register");
+        final JLabel usernameLabel = new JLabel("Username:");
+        final JTextField usernameField = new JTextField();
+        final JLabel passwordLabel = new JLabel("Password:");
+        final JPasswordField passwordField = new JPasswordField();
+        final JButton loginButton = new JButton("Login");
+        final JButton registerButton = new JButton("Register");
 
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+                final String username = usernameField.getText();
+                final String password = new String(passwordField.getPassword());
 
-                LoginOutputData result = loginController.login(username, password);
+                final LoginOutputData result = loginController.login(username, password);
 
                 if (result.isSuccess()) {
                     JOptionPane.showMessageDialog(null, result.getMessage());
-                    dispose(); // Close the login page
-                    MainFrame.launchMainFrame(); // Show MainFrame after successful login
-                } else {
-                    JOptionPane.showMessageDialog(null, result.getMessage(), "Login Failed", JOptionPane.ERROR_MESSAGE);
+                    dispose();
+                    MainFrame.launchMainFrame();
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, result.getMessage(),
+                            "Login Failed", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -55,15 +62,17 @@ public class LoginPage extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+                final String username = usernameField.getText();
+                final String password = new String(passwordField.getPassword());
 
-                RegisterOutputData result = registerController.register(username, password);
+                final RegisterOutputData result = registerController.register(username, password);
 
                 if (result.isSuccess()) {
                     JOptionPane.showMessageDialog(null, result.getMessage());
-                } else {
-                    JOptionPane.showMessageDialog(null, result.getMessage(), "Registration Failed", JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, result.getMessage(),
+                            "Registration Failed", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

@@ -11,15 +11,17 @@ public class LoginInteractor implements LoginInputBoundary {
     private final UserStore userStore;
 
     public LoginInteractor() {
-        this.userStore = InMemoryUserStore.getInstance(); // Use singleton
+        this.userStore = InMemoryUserStore.getInstance();
     }
 
     @Override
     public LoginOutputData login(LoginInputData inputData) {
-        User user = userStore.getUser(inputData.getUsername());
+        final User user = userStore.getUser(inputData.getUsername());
         if (user != null && user.getPassword().equals(inputData.getPassword())) {
-            return new LoginOutputData(true, "Login successful. Welcome, " + inputData.getUsername() + "!");
-        } else {
+            return new LoginOutputData(true, "Login successful. Welcome, "
+                    + inputData.getUsername() + "!");
+        }
+        else {
             return new LoginOutputData(false, "Invalid username or password.");
         }
     }

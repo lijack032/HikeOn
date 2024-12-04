@@ -11,7 +11,7 @@ public class RegisterInteractor implements RegisterInputBoundary {
     private final UserStore userStore;
 
     public RegisterInteractor() {
-        this.userStore = InMemoryUserStore.getInstance(); // Use singleton
+        this.userStore = InMemoryUserStore.getInstance();
     }
 
     @Override
@@ -22,12 +22,8 @@ public class RegisterInteractor implements RegisterInputBoundary {
         if (inputData.getPassword().length() < 6) {
             return new RegisterOutputData(false, "Password must be at least 6 characters long.");
         }
-        boolean added = userStore.addUser(new User(inputData.getUsername(), inputData.getPassword()));
-        if (added) {
-            return new RegisterOutputData(true, "Registration successful.");
-        } else {
-            return new RegisterOutputData(false, "Registration failed. Try again.");
-        }
+        userStore.addUser(new User(inputData.getUsername(), inputData.getPassword()));
+        return new RegisterOutputData(true, "Registration successful.");
     }
 }
 

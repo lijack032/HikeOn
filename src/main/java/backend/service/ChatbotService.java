@@ -30,8 +30,8 @@ public class ChatbotService {
 
     private static String loadApiKey() {
         final Dotenv dotenv = Dotenv.configure()
-                                    .filename("OpenAI_Key.env")
-                                    .directory("C:/Users/Arshiya/Desktop/Projects/HikeOn")
+                                    .filename(".env")
+                                    .directory("/Users/jackli/Downloads/HikeOn")
                                     .load();
         final String apiKey = dotenv.get("OPEN_AI_API_KEY");
         if (apiKey == null || apiKey.isEmpty()) {

@@ -48,7 +48,9 @@ public class ChatbotController {
         // Get the response from the chatbot service asynchronously (to avoid blocking the UI)
         new Thread(() -> {
             final String chatbotResponse = chatbotService.getChatbotResponse(currentSession.getSessionId(),
-                userMessage);
+
+                    userMessage);
+
 
             // Add the chatbot's response to the session's conversation history
             currentSession.addMessage("AI: " + chatbotResponse);

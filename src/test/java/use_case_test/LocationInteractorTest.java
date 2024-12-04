@@ -2,7 +2,6 @@ package use_case_test;
 
 import entity.GeoLocation;
 import entity.HikingSpot;
-import frontend.utils.HttpClientStub;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,14 +58,6 @@ public class LocationInteractorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetCoordinates_InvalidLocation() throws Exception {
-        // Stub HttpClient static methods
-        HttpClientStub.stubSendGetRequest("geocode", """
-                {
-                  "results": []
-                }
-                """);
-
-        // Directly call the package-private method
         interactor.getCoordinates("Invalid Location");
     }
 

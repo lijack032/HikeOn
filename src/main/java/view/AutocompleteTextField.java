@@ -51,10 +51,7 @@ public class AutocompleteTextField extends JTextField {
             @Override
             public void keyReleased(KeyEvent e) {
                 final String text = getText().trim();
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    suggestionsPopup.setVisible(false);
-                }
-                else if (text.length() > 2) {
+                if (text.length() > 2) {
                     debounceFetchSuggestions(text);
                 }
                 else {
@@ -84,10 +81,6 @@ public class AutocompleteTextField extends JTextField {
     }
 
     private void debounceFetchSuggestions(String input) {
-        if (debounceFuture != null) {
-            debounceFuture.cancel(false);
-        }
-
         latestInput = input;
 
         debounceFuture = debounceExecutor.schedule(() -> {
