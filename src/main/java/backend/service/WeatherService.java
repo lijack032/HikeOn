@@ -30,6 +30,7 @@ public class WeatherService {
      * 
      * @param location the location to fetch weather for
      * @return a Weather object representing the current weather
+     * @throws RuntimeException if there is an error fetching current weather data
      */
     public Weather getWeather(String location) {
         try {
@@ -51,6 +52,7 @@ public class WeatherService {
      * 
      * @param location the location to fetch forecast for
      * @return a list of Weather objects representing the forecast
+     * @throws RuntimeException if there is an error fetching forecast data
      */
     public List<Weather> getWeatherWithForecast(String location) {
         final List<Weather> forecastList = new ArrayList<>();
@@ -65,7 +67,8 @@ public class WeatherService {
                 final long timestamp = forecastEntry.getLong("dt");
                 final String formattedTime = convertUnixToTimestamp(timestamp);
 
-                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0).getString("description");
+                final String condition = forecastEntry.getJSONArray("weather").getJSONObject(0)
+                    .getString("description");
                 final double temperature = forecastEntry.getJSONObject("main").getDouble("temp");
 
                 forecastList.add(new Weather(formattedTime, condition, temperature));
@@ -84,7 +87,8 @@ public class WeatherService {
      * @return the formatted timestamp string (e.g., "2024-12-03 18:00:00")
      */
     private String convertUnixToTimestamp(long unixTimestamp) {
-        final Date date = new Date(unixTimestamp * 1000); // Convert seconds to milliseconds
+        // Convert seconds to milliseconds
+        final Date date = new Date(unixTimestamp * 1000);
         final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(date);
     }
