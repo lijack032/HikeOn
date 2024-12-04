@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import frontend.model.Location;
+import frontend.model.HikingSpot;
 
 /**
  * A panel to display location results.
@@ -34,14 +34,14 @@ public class LocationPanel extends JPanel {
      * 
      * @param locations the list of locations to display
      */
-    public void displayLocationResults(List<Location> locations) {
+    public void displayLocationResults(List<HikingSpot> locations) {
         // Clear the text area
         locationResultsArea.setText(""); 
         if (locations.isEmpty()) {
             locationResultsArea.append("No locations found.");
         } 
         else {
-            for (Location location : locations) {
+            for (HikingSpot location : locations) {
                 locationResultsArea.append(location.getName() + "\n");
                 locationResultsArea.append("Address: " + location.getName() + "\n\n");
             }

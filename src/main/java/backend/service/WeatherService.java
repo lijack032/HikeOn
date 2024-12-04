@@ -33,12 +33,12 @@ public class WeatherService {
      */
     public Weather getWeather(String location) {
         try {
-            String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
-            JSONObject weatherData = fetchWeatherData(requestUrl);
+            final String requestUrl = String.format(WEATHER_API_URL, location, API_KEY);
+            final JSONObject weatherData = fetchWeatherData(requestUrl);
 
             // Parse and return current weather
-            String condition = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
-            double temperature = weatherData.getJSONObject("main").getDouble("temp");
+            final String condition = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
+            final double temperature = weatherData.getJSONObject("main").getDouble("temp");
             return new Weather(condition, temperature);
         } 
         catch (IOException e) {
@@ -90,11 +90,11 @@ public class WeatherService {
     }
 
     private static String loadWeatherApiKey() {
-        Dotenv dotenv = Dotenv.configure()
+        final Dotenv dotenv = Dotenv.configure()
             .filename("OpenWeatherKey.env")
             .directory("/Users/vabku/OneDrive/Desktop/CSC207/HikeOn/HikeOn")
             .load();
-        String apiKey = dotenv.get("OPENWEATHER_API_KEY");
+        final String apiKey = dotenv.get("OPENWEATHER_API_KEY");
         if (apiKey == null || apiKey.isEmpty()) {
             throw new IllegalStateException("Weather API Key not found in Weather_key.env file");
         }

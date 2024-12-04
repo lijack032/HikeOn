@@ -1,13 +1,22 @@
 package view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import backend.service.ChatbotService;
-import entity.InMemoryUserStore;
 import frontend.controller.ChatbotController;
 import frontend.view.panels.ChatbotPanel;
 import interface_adapter.autentication.login.LoginController;
@@ -50,7 +59,8 @@ public class MainFrame {
 
         final JFrame frame = createMainFrame(controller);
         frame.add(createTitlePanel(), BorderLayout.NORTH);
-        frame.add(createCenterPanel(controller, logoutController, frame), BorderLayout.CENTER); // Pass frame here
+        frame.add(createCenterPanel(controller, logoutController, frame),
+                BorderLayout.CENTER);
         frame.add(createFooterPanel(), BorderLayout.SOUTH);
         frame.setVisible(true);
     }
@@ -82,11 +92,10 @@ public class MainFrame {
 
         addLocationComponents(centerPanel, gbc, locationController);
         addWeatherComponents(centerPanel, gbc);
-        addButtons(centerPanel, gbc, locationController, logoutController, frame); // Pass frame here
+        addButtons(centerPanel, gbc, locationController, logoutController, frame);
 
         return centerPanel;
     }
-
 
     private static GridBagConstraints createGridBagConstraints() {
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -130,7 +139,7 @@ public class MainFrame {
         addWeatherButton(panel, gbc);
         addGoogleMapsButton(panel, gbc, locationController);
         addHikeOnAiButton(panel, gbc);
-        addLogoutButton(panel, gbc, logoutController, frame); // Pass frame here
+        addLogoutButton(panel, gbc, logoutController, frame);
     }
 
     private static void addWeatherButton(JPanel panel, GridBagConstraints gbc) {
@@ -187,11 +196,12 @@ public class MainFrame {
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                logoutController.logout(); // Perform logout
-                frame.dispose(); // Close the MainFrame
-                new LoginPage(new LoginController(new LoginInteractor()),
-                        new RegisterController(new RegisterInteractor()))
-                        .setVisible(true); // Relaunch the LoginPage
+                logoutController.logout();
+                frame.dispose();
+                new LoginPage(
+                    new LoginController(new LoginInteractor()),
+                    new RegisterController(new RegisterInteractor()))
+                    .setVisible(true);
             }
         });
 
