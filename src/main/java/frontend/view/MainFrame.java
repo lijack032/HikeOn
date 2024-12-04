@@ -21,7 +21,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import backend.service.ChatbotService;
-import backend.service.WeatherService;
 import frontend.controller.ChatbotController;
 import frontend.controller.LocationController;
 import frontend.controller.WeatherController;
