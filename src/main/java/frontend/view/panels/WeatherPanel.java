@@ -31,15 +31,15 @@ public class WeatherPanel extends JPanel {
         add(windSpeedLabel);
     }
 
-    /**
-     * Updates the weather information displayed on the panel.
-     *
-     * @param weather the Weather object containing updated weather information
-     */
-    public void updateWeather(Weather weather) {
-        conditionLabel.setText("Condition: " + weather.getCondition());
-        temperatureLabel.setText("Temperature: " + weather.getTemperature() + " degrees C");
-        humidityLabel.setText("Humidity: " + weather.getHumidity() + "%");
-        windSpeedLabel.setText("Wind Speed: " + weather.getWindSpeed() + " km/h");
-    }
+//    /**
+//     * Updates the weather information displayed on the panel.
+//     *
+//     * @param weather the Weather object containing updated weather information
+//     */
+//    public void updateWeather(Weather weather) {
+//        conditionLabel.setText("Condition: " + weather.getCondition());
+//        temperatureLabel.setText("Temperature: " + weather.getTemperature() + " degrees C");
+//        humidityLabel.setText("Humidity: " + weather.getHumidity() + "%");
+//        windSpeedLabel.setText("Wind Speed: " + weather.getWindSpeed() + " km/h");
+//    }
 }
