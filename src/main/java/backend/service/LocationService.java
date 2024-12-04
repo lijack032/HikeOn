@@ -57,7 +57,7 @@ public class LocationService {
      */
     public List<HikingSpot> findNearbyHikingSpots(GeoLocation geoLocation, String location) {
         final String apiUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
-                + "query=hiking+trail" + location.replace(" ", "+") + "&location="
+                + "query=hiking+UseCases" + location.replace(" ", "+") + "&location="
                 + geoLocation.getLatitude() + "," + geoLocation.getLongitude()
                 + "&radius=50000" + "&key=" + GOOGLE_API_KEY;
 
@@ -98,12 +98,12 @@ public class LocationService {
 
     private static String loadGoogleApiKey() {
         final Dotenv dotenv = Dotenv.configure()
-                .filename("Google_key.env")
+                .filename(".env")
                 .directory("/Users/jackli/Downloads/HikeOn")
                 .load();
         final String apiKey = dotenv.get("Google_API_KEY");
         if (apiKey == null || apiKey.isEmpty()) {
-            throw new IllegalStateException("API Key not found in Google_key.env file");
+            throw new IllegalStateException("API Key not found in .env file");
         }
         return apiKey;
     }
