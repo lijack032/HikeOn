@@ -22,7 +22,8 @@ import use_case.locationSearch.LocationInteractor;
 import use_case.login.LoginInteractor;
 import use_case.logout.LogoutInteractor;
 import use_case.register.RegisterInteractor;
-import frontend.controller.WeatherController;
+//import frontend.controller.WeatherController;
+import interface_adapter.weathersearch.WeatherController;
 
 /**
  * Main frame for the HikeOn application.

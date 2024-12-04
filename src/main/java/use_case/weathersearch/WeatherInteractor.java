@@ -1,4 +1,8 @@
-package backend.service;
+package use_case.weathersearch;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -7,15 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import io.github.cdimascio.dotenv.Dotenv;
-
 /**
  * Service for fetching weather data.
  */
-public class WeatherService {
+public class WeatherInteractor {
     private static final String API_KEY = loadWeatherApiKey();
     private static final String WEATHER_API_URL =
             "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
@@ -52,6 +51,9 @@ public class WeatherService {
      * @return a string describing the current weather and forecast
      */
     public List<String> getWeatherWithForecast(String location) {
+        if (location == null || location.trim().isEmpty()) {
+            throw new IllegalArgumentException("Location cannot be empty!");
+        }
         final List<String> forecastList = new ArrayList<>();
         try {
             // Current weather (you can skip this part if already handled elsewhere)

@@ -1,20 +1,20 @@
-package frontend.controller;
+package interface_adapter.weathersearch;
+
+import use_case.weathersearch.WeatherInteractor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import backend.service.WeatherService;
-
 /**
  * Controller for handling weather-related requests.
  */
 public class WeatherController {
-    private final WeatherService weatherService;
+    private final WeatherInteractor weatherService;
 
     public WeatherController() {
-        this.weatherService = new WeatherService();
+        this.weatherService = new WeatherInteractor();
     }
 
     /**
