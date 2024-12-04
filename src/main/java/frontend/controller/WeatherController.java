@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.io.IOException;
 
 import backend.service.WeatherService;
 import entity.Weather;
@@ -13,10 +12,14 @@ import entity.Weather;
  * Controller for handling weather-related requests.
  */
 public class WeatherController {
-    private final WeatherService weatherService;
+    private WeatherService weatherService;
 
     public WeatherController() {
         this.weatherService = new WeatherService();
+    }
+
+    public WeatherController(WeatherService weatherService) {
+        this.weatherService = weatherService;
     }
 
     /**
@@ -25,20 +28,17 @@ public class WeatherController {
      * @return formatted weather data
      */
     public String getFormattedWeather(String location) {
-        String result;
+        final String result;
         if (location == null || location.trim().isEmpty()) {
             result = "Location cannot be empty!";
-        } else {
-            try {
-                // Fetch current weather and forecast data
-                final Weather currentWeather = weatherService.getWeather(location);
-                final List<Weather> forecast = weatherService.getWeatherWithForecast(location);
+        } 
+        else {
+            // Fetch current weather and forecast data
+            final Weather currentWeather = weatherService.getWeather(location);
+            final List<Weather> forecast = weatherService.getWeatherWithForecast(location);
 
-                // Format the data
-                result = formatWeather(currentWeather, forecast);
-            } catch (RuntimeException exception) {
-                result = "Error fetching weather data: " + exception.getMessage();
-            }
+            // Format the data
+            result = formatWeather(currentWeather, forecast);
         }
         return result;
     }

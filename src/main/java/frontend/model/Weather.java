@@ -1,10 +1,10 @@
-package entity;
+package frontend.model;
 
 /**
  * Entity class representing weather data.
  */
 public class Weather {
-    private String timestamp; // Optional for forecasts
+    private String timestamp;
     private String condition;
     private double temperature;
 
