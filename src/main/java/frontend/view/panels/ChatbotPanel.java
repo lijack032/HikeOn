@@ -51,8 +51,10 @@ public class ChatbotPanel extends JPanel {
         inputField = new JTextField();
         inputField.setFont(new Font(FONT_FAMILY, Font.PLAIN, FONT_SIZE));
         inputField.setBorder(BorderFactory.createCompoundBorder(
+
                 BorderFactory.createLineBorder(Color.GRAY),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)
+
         ));
 
         sendButton = new JButton("Send");
@@ -130,4 +132,6 @@ public class ChatbotPanel extends JPanel {
     public void addSendButtonListener(ActionListener listener) {
         sendButton.addActionListener(listener);
     }
+
 }
+

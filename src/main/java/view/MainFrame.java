@@ -1,10 +1,20 @@
 package view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import backend.service.ChatbotService;
 import frontend.controller.ChatbotController;
@@ -50,7 +60,8 @@ public class MainFrame {
 
         final JFrame frame = createMainFrame(controller);
         frame.add(createTitlePanel(), BorderLayout.NORTH);
-        frame.add(createCenterPanel(controller, logoutController, frame), BorderLayout.CENTER); // Pass frame here
+        frame.add(createCenterPanel(controller, logoutController, frame),
+                BorderLayout.CENTER);
         frame.add(createFooterPanel(), BorderLayout.SOUTH);
         frame.setVisible(true);
     }
@@ -232,9 +243,11 @@ public class MainFrame {
             public void actionPerformed(ActionEvent e) {
                 logoutController.logout();
                 frame.dispose();
+
                 new LoginPage(new LoginController(new LoginInteractor()),
                         new RegisterController(new RegisterInteractor()))
                         .setVisible(true);
+
             }
         });
 

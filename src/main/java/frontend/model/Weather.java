@@ -1,28 +1,40 @@
-package frontend.model;
+package entity;
 
 /**
- * Represents the weather conditions.
- * 
- * @null
+ * Entity class representing weather data.
  */
 public class Weather {
+    private String timestamp; // Optional for forecasts
     private String condition;
     private double temperature;
-    private double humidity;
-    private double windSpeed;
 
-    public Weather(String condition, double temperature, double humidity, double windSpeed) {
+    /**
+     * Constructor for current weather data.
+     * 
+     * @param condition the weather condition (e.g., "clear sky")
+     * @param temperature the temperature in Celsius
+     */
+    public Weather(String condition, double temperature) {
         this.condition = condition;
         this.temperature = temperature;
-        this.humidity = humidity;
-        this.windSpeed = windSpeed;
     }
 
-    public Weather(String weatherData) {
-        // Initialize the Weather object using the weatherData string
-        
-        // Example: parse the weatherData string and set the fields accordingly
+    /**
+     * Constructor for forecast weather data.
+     * 
+     * @param timestamp the formatted timestamp (e.g., "2024-12-03 18:00:00")
+     * @param condition the weather condition (e.g., "clear sky")
+     * @param temperature the temperature in Celsius
+     */
+    public Weather(String timestamp, String condition, double temperature) {
+        this.timestamp = timestamp;
+        this.condition = condition;
+        this.temperature = temperature;
+    }
 
+    // Getters
+    public String getTimestamp() {
+        return timestamp;
     }
 
     public String getCondition() {
@@ -33,12 +45,16 @@ public class Weather {
         return temperature;
     }
 
-    public double getHumidity() {
-        return humidity;
+    // Optional: Setters if needed
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public double getWindSpeed() {
-        return windSpeed;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
-    
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
 }

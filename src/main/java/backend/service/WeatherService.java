@@ -3,12 +3,16 @@ package backend.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import entity.Weather;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -17,6 +21,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 public class WeatherService {
     private static final String API_KEY = loadWeatherApiKey();
+
     private static final String WEATHER_API_URL =
             "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s";
     private static final String FORECAST_API_URL =
@@ -35,6 +40,7 @@ public class WeatherService {
             final JSONObject weatherData = fetchWeatherData(requestUrl);
 
             // Parse and return current weather
+
             final String description = weatherData.getJSONArray("weather").getJSONObject(0).getString("description");
             final double temperature = weatherData.getJSONObject("main").getDouble("temp");
             result = String.format("Weather: %s, Temperature: %.2f degrees Celsius", description, temperature);
@@ -46,6 +52,7 @@ public class WeatherService {
     }
 
     /**
+
      * Fetches the weather and forecast data for a given location.
      *
      * @param location the location to fetch weather and forecast for
@@ -112,6 +119,9 @@ public class WeatherService {
         if (connection.getResponseCode() != 200) {
             throw new IOException("Failed to fetch data: HTTP " + connection.getResponseCode());
         }
+        return apiKey;
+    }
+
 
         try (Scanner scanner = new Scanner(connection.getInputStream())) {
             final StringBuilder response = new StringBuilder();
