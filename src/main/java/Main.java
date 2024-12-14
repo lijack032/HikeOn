@@ -1,9 +1,8 @@
-package view;
-
 import interface_adapter.login.LoginController;
 import interface_adapter.register.RegisterController;
 import use_case.login.LoginInteractor;
 import use_case.register.RegisterInteractor;
+import view.LoginPage;
 
 public class Main {
     public static void main(String[] args) {
